@@ -322,9 +322,7 @@ body {
     transition: opacity 0.2s;
 }
 
-section:hover .section-controls,
-#current-details-row:hover > .section-controls,
-#sun-moon-row:hover > .section-controls {
+section:hover .section-controls {
     opacity: 1;
 }
 
@@ -341,6 +339,7 @@ section:hover .section-controls,
     cursor: grabbing;
 }
 
+.section-width-btn,
 .section-min-btn {
     background: none;
     border: none;
@@ -351,6 +350,7 @@ section:hover .section-controls,
     line-height: 1;
 }
 
+.section-width-btn:hover,
 .section-min-btn:hover {
     color: var(--text);
 }
@@ -377,7 +377,7 @@ section:hover .section-controls,
     background: var(--border-light);
     border: 2px dashed var(--border);
     border-radius: 12px;
-    margin-bottom: 1rem;
+    min-height: 60px;
 }
 
 .section-dragging {
@@ -440,15 +440,18 @@ section {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 1.25rem;
-    margin-bottom: 1rem;
     box-shadow: var(--card-shadow);
     transition: background 0.3s;
+    min-width: 0;
+    overflow: hidden;
+    margin-top: 0;
 }
 
-#current-details-row,
-#sun-moon-row {
-    position: relative;
+/* Ensure spacing after column-spanning elements */
+#weather-content > #weather-summary {
+    margin-bottom: 0.5rem;
 }
+
 
 section h2 {
     font-size: 1rem;
@@ -479,21 +482,56 @@ section h2 {
     display: none;
 }
 
-/* Current + Details row */
-#current-details-row {
+/* Weather content layout */
+.columns-row {
     display: flex;
     gap: 1rem;
     align-items: flex-start;
+    margin-bottom: 1rem;
 }
 
-#current-details-row #current-section {
-    flex: 1;
-}
-
-#current-details-row #details-section {
+.weather-col {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 2rem;
+}
+
+.section-wide {
+    margin-bottom: 1rem;
+}
+
+/* Empty column rows: collapsed normally, expand during drag */
+.columns-row:not(:has(section)):not(:has(.drag-placeholder)) {
+    margin: 0;
+}
+
+.columns-row:not(:has(section)):not(:has(.drag-placeholder)) .weather-col {
+    min-height: 0;
+}
+
+/* When dragging, expand all empty columns as drop targets */
+body.is-dragging .weather-col {
+    min-height: 80px;
+}
+
+body.is-dragging .weather-col:empty {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    opacity: 0.5;
+}
+
+#details-section {
+    min-width: 0;
     overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .columns-row {
+        flex-direction: column;
+    }
 }
 
 .current-main {
@@ -619,12 +657,6 @@ section h2 {
     font-weight: 600;
 }
 
-@media (max-width: 600px) {
-    #current-details-row {
-        flex-direction: column;
-    }
-}
-
 /* Hourly scroll */
 .hourly-scroll {
     display: flex;
@@ -726,7 +758,7 @@ section h2 {
     padding: 0.5rem 0 0.25rem;
     position: sticky;
     left: 0;
-    width: fit-content;
+    right: 0;
     align-items: center;
 }
 
@@ -746,6 +778,39 @@ section h2 {
 
 .chart-drag-handle:active {
     cursor: grabbing;
+}
+
+.chart-min-btn {
+    background: var(--card-bg);
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+    padding: 0 0.3rem;
+    position: sticky;
+    right: 0;
+    margin-left: auto;
+    z-index: 3;
+}
+
+.chart-row:hover .chart-min-btn {
+    opacity: 1;
+}
+
+.chart-min-btn:hover {
+    color: var(--text);
+}
+
+#hidden-charts-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    position: sticky;
+    left: 0;
+    width: fit-content;
 }
 
 .chart-row-inner {
@@ -803,15 +868,7 @@ section h2 {
     border-radius: 8px;
 }
 
-/* Sun & Moon row */
-#sun-moon-row {
-    display: flex;
-    gap: 1rem;
-}
-
-#sun-moon-row section {
-    flex: 1;
-}
+/* Sun & Moon */
 
 .astro-grid {
     display: grid;
@@ -833,11 +890,6 @@ section h2 {
     font-weight: 600;
 }
 
-@media (max-width: 600px) {
-    #sun-moon-row {
-        flex-direction: column;
-    }
-}
 
 /* Loading state */
 .loading {

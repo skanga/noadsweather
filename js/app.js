@@ -82,28 +82,54 @@ function fmtPrecip(val) {
 // --- Section Preferences System -----------------------------------------------
 
 const DEFAULT_SECTION_ORDER = [
-    'current-details-row', 'hourly-section', 'daily-section',
-    'radar-section', 'sun-moon-row'
+    'current-section', 'details-section', 'hourly-section', 'daily-section',
+    'radar-section', 'sun-section', 'moon-section'
+];
+
+// Default layout: ordered list with column assignments
+// 'left', 'right', or 'wide'
+const DEFAULT_LAYOUT_LIST = [
+    { id: 'current-section', col: 'left' },
+    { id: 'details-section', col: 'right' },
+    { id: 'hourly-section', col: 'wide' },
+    { id: 'daily-section', col: 'wide' },
+    { id: 'radar-section', col: 'left' },
+    { id: 'sun-section', col: 'right' },
+    { id: 'moon-section', col: 'right' },
 ];
 
 const DEFAULT_CHART_ORDER = ['chart-temp', 'chart-atmos', 'chart-precip', 'chart-wind'];
+const DEFAULT_WIDE_SECTIONS = ['daily-section', 'hourly-section'];
 
 const SECTION_NAMES = {
-    'current-details-row': 'Current & Pollen',
+    'current-section': 'Current Conditions',
+    'details-section': 'Pollen',
     'hourly-section': 'Hourly Forecast',
     'daily-section': '10-Day Forecast',
     'radar-section': 'Radar',
-    'sun-moon-row': 'Sun & Moon',
+    'sun-section': 'Sun',
+    'moon-section': 'Moon',
 };
+
+// Sections that always span 2 columns
 
 function loadSectionPrefs() {
     const stored = JSON.parse(localStorage.getItem('sectionPrefs') || 'null');
-    return stored || {
+    // Validate — if missing layoutList, reset
+    if (stored && !stored.layoutList) {
+        localStorage.removeItem('sectionPrefs');
+        return { layoutList: JSON.parse(JSON.stringify(DEFAULT_LAYOUT_LIST)), hidden: [], minimized: [], chartOrder: [...DEFAULT_CHART_ORDER], hiddenCharts: [] };
+    }
+    const prefs = stored || {
         order: [...DEFAULT_SECTION_ORDER],
         hidden: [],
         minimized: [],
         chartOrder: [...DEFAULT_CHART_ORDER],
+        hiddenCharts: [],
     };
+    if (!prefs.hiddenCharts) prefs.hiddenCharts = [];
+    if (!prefs.layoutList) prefs.layoutList = JSON.parse(JSON.stringify(DEFAULT_LAYOUT_LIST));
+    return prefs;
 }
 
 function saveSectionPrefs(prefs) {
@@ -115,23 +141,62 @@ function applySectionPreferences() {
     const container = document.getElementById('weather-content');
     if (!container) return;
 
-    // Reset all sections first (clear inline hiding/minimized from previous state)
+    // Reset all sections
     for (const id of DEFAULT_SECTION_ORDER) {
         const el = document.getElementById(id);
         if (el) {
             el.style.display = '';
             el.classList.remove('section-minimized');
+            el.classList.remove('section-wide');
+            // Move back to container temporarily
+            container.appendChild(el);
         }
     }
 
-    // Reorder: alerts + summary stay first, then ordered sections
-    for (const id of prefs.order) {
-        const el = document.getElementById(id);
-        if (el) container.appendChild(el);
-    }
-    // Privacy toggle and spacer stay at end
+    // Remove old layout rows
+    container.querySelectorAll('.columns-row').forEach(r => r.remove());
+
+    // Build layout from prefs.layoutList
+    // Walk through the list and group consecutive left/right items into columns-rows
+    // Wide items break the row
     const spacer = container.querySelector('.bottom-spacer');
-    if (spacer) container.appendChild(spacer);
+    let currentLeft = [];
+    let currentRight = [];
+
+    function flushColumns(force) {
+        if (!force && currentLeft.length === 0 && currentRight.length === 0) return;
+        const row = document.createElement('div');
+        row.className = 'columns-row';
+        const left = document.createElement('div');
+        left.className = 'weather-col';
+        const right = document.createElement('div');
+        right.className = 'weather-col';
+        for (const el of currentLeft) left.appendChild(el);
+        for (const el of currentRight) right.appendChild(el);
+        row.appendChild(left);
+        row.appendChild(right);
+        container.insertBefore(row, spacer);
+        currentLeft = [];
+        currentRight = [];
+    }
+
+    for (const item of prefs.layoutList) {
+        const el = document.getElementById(item.id);
+        if (!el) continue;
+
+        if (item.col === 'wide') {
+            flushColumns();
+            el.classList.add('section-wide');
+            container.insertBefore(el, spacer);
+        } else if (item.col === 'left') {
+            currentLeft.push(el);
+        } else {
+            currentRight.push(el);
+        }
+    }
+    flushColumns();
+    // Always add an empty drop-target row at the end
+    flushColumns(true);
 
     // Apply hidden
     for (const id of prefs.hidden) {
@@ -154,46 +219,58 @@ function applySectionPreferences() {
 }
 
 function injectSectionControls() {
-    const prefs = loadSectionPrefs();
-    for (const id of prefs.order) {
+    for (const id of DEFAULT_SECTION_ORDER) {
         const el = document.getElementById(id);
         if (!el || el.style.display === 'none') continue;
         el.setAttribute('data-section-name', SECTION_NAMES[id] || id);
-        // Remove old controls (innerHTML wipes them, but just in case)
         const old = el.querySelector('.section-controls');
         if (old) old.remove();
 
+        const isMin = el.classList.contains('section-minimized');
+        const isWide = el.classList.contains('section-wide');
+
         const controls = document.createElement('div');
         controls.className = 'section-controls';
-
-        const isMin = el.classList.contains('section-minimized');
         controls.innerHTML = `
             <span class="section-drag-handle" title="Drag to reorder">⠿</span>
+            <button class="section-width-btn" title="${isWide ? 'Single column' : 'Full width'}">${isWide ? '▣' : '◫'}</button>
             <button class="section-min-btn" title="${isMin ? 'Remove section' : 'Minimize section'}">${isMin ? '✕' : '−'}</button>
         `;
         el.prepend(controls);
 
+        // Width toggle
+        controls.querySelector('.section-width-btn').addEventListener('click', () => {
+            const p = loadSectionPrefs();
+            const item = p.layoutList.find(x => x.id === id);
+            if (!item) return;
+            if (item.col === 'wide') {
+                item.col = 'left';
+            } else {
+                item.col = 'wide';
+            }
+            saveSectionPrefs(p);
+            applySectionPreferences();
+        });
+
+        // Minimize/hide
         controls.querySelector('.section-min-btn').addEventListener('click', () => {
             const p = loadSectionPrefs();
             if (el.classList.contains('section-minimized')) {
-                // Already minimized — now hide permanently
                 el.style.display = 'none';
                 p.minimized = p.minimized.filter(x => x !== id);
                 if (!p.hidden.includes(id)) p.hidden.push(id);
                 saveSectionPrefs(p);
                 renderHiddenSectionsBar();
             } else {
-                // Minimize
                 el.classList.add('section-minimized');
                 if (!p.minimized.includes(id)) p.minimized.push(id);
                 saveSectionPrefs(p);
-                // Update button
                 controls.querySelector('.section-min-btn').textContent = '✕';
                 controls.querySelector('.section-min-btn').title = 'Remove section';
             }
         });
 
-        // Click on minimized section header to expand
+        // Click minimized section to expand
         el.addEventListener('click', (e) => {
             if (!el.classList.contains('section-minimized')) return;
             if (e.target.closest('.section-controls')) return;
@@ -252,13 +329,14 @@ function initSectionDrag() {
     let dragEl = null;
     let placeholder = null;
     let offsetY = 0;
+    let offsetX = 0;
     let dragActive = false;
 
     container.addEventListener('pointerdown', (e) => {
         const handle = e.target.closest('.section-drag-handle');
         if (!handle) return;
 
-        dragEl = handle.closest('section, #current-details-row, #sun-moon-row');
+        dragEl = handle.closest('section');
         if (!dragEl || !DEFAULT_SECTION_ORDER.includes(dragEl.id)) return;
 
         e.preventDefault();
@@ -266,6 +344,7 @@ function initSectionDrag() {
 
         const rect = dragEl.getBoundingClientRect();
         offsetY = e.clientY - rect.top;
+        offsetX = e.clientX - rect.left;
 
         placeholder = document.createElement('div');
         placeholder.className = 'drag-placeholder';
@@ -275,10 +354,11 @@ function initSectionDrag() {
         dragEl.classList.add('section-dragging');
         dragEl.style.position = 'fixed';
         dragEl.style.top = (e.clientY - offsetY) + 'px';
-        dragEl.style.left = rect.left + 'px';
+        dragEl.style.left = (e.clientX - offsetX) + 'px';
         dragEl.style.width = rect.width + 'px';
         dragEl.style.zIndex = '999';
         dragActive = true;
+        document.body.classList.add('is-dragging');
     });
 
     container.addEventListener('pointermove', (e) => {
@@ -286,23 +366,38 @@ function initSectionDrag() {
         e.preventDefault();
 
         dragEl.style.top = (e.clientY - offsetY) + 'px';
+        dragEl.style.left = (e.clientX - offsetX) + 'px';
 
-        // Find where to insert placeholder
-        const children = [...container.children].filter(c =>
-            DEFAULT_SECTION_ORDER.includes(c.id) && c !== dragEl
-        );
-
-        for (const child of children) {
-            const rect = child.getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
-            if (e.clientY < midY) {
-                container.insertBefore(placeholder, child);
-                return;
+        // Find the nearest column to the cursor
+        const cols = [...container.querySelectorAll('.weather-col')];
+        let targetCol = null;
+        let minDist = Infinity;
+        for (const col of cols) {
+            const r = col.getBoundingClientRect();
+            // Distance: 0 if inside, otherwise distance to nearest edge
+            const dx = e.clientX < r.left ? r.left - e.clientX : e.clientX > r.right ? e.clientX - r.right : 0;
+            const dy = e.clientY < r.top ? r.top - e.clientY : e.clientY > r.bottom ? e.clientY - r.bottom : 0;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < minDist) {
+                minDist = dist;
+                targetCol = col;
             }
         }
-        // If past all, put at end (before spacer)
-        const spacer = container.querySelector('.bottom-spacer');
-        if (spacer) container.insertBefore(placeholder, spacer);
+
+        if (targetCol && minDist < 200) {
+            if (placeholder.parentNode !== targetCol) targetCol.appendChild(placeholder);
+            const siblings = [...targetCol.querySelectorAll('section:not(.section-dragging)')];
+            let inserted = false;
+            for (const sib of siblings) {
+                const r = sib.getBoundingClientRect();
+                if (e.clientY < r.top + r.height / 2) {
+                    targetCol.insertBefore(placeholder, sib);
+                    inserted = true;
+                    break;
+                }
+            }
+            if (!inserted) targetCol.appendChild(placeholder);
+        }
     });
 
     const endDrag = () => {
@@ -318,17 +413,33 @@ function initSectionDrag() {
         dragEl.style.width = '';
         dragEl.style.zIndex = '';
 
-        // Save new order
-        const newOrder = [...container.children]
-            .filter(el => DEFAULT_SECTION_ORDER.includes(el.id))
-            .map(el => el.id);
+        // Rebuild layoutList from current DOM state
         const prefs = loadSectionPrefs();
-        prefs.order = newOrder;
+        const newList = [];
+        // Walk through all columns-rows and wide sections in order
+        for (const child of container.children) {
+            if (child.classList && child.classList.contains('columns-row')) {
+                const left = child.querySelector('.weather-col:first-child');
+                const right = child.querySelector('.weather-col:last-child');
+                const leftSections = left ? [...left.querySelectorAll('section')].map(s => s.id) : [];
+                const rightSections = right ? [...right.querySelectorAll('section')].map(s => s.id) : [];
+                // Interleave left and right to maintain relative order
+                const maxLen = Math.max(leftSections.length, rightSections.length);
+                for (let i = 0; i < maxLen; i++) {
+                    if (i < leftSections.length) newList.push({ id: leftSections[i], col: 'left' });
+                    if (i < rightSections.length) newList.push({ id: rightSections[i], col: 'right' });
+                }
+            } else if (child.tagName === 'SECTION' && DEFAULT_SECTION_ORDER.includes(child.id)) {
+                newList.push({ id: child.id, col: 'wide' });
+            }
+        }
+        if (newList.length > 0) prefs.layoutList = newList;
         saveSectionPrefs(prefs);
 
         dragEl = null;
         placeholder = null;
         dragActive = false;
+        document.body.classList.remove('is-dragging');
     };
 
     container.addEventListener('pointerup', endDrag);
@@ -336,17 +447,83 @@ function initSectionDrag() {
 }
 
 function applyChartOrder(chartOrder) {
-    // Run after a short delay to let requestAnimationFrame draw the charts first
     requestAnimationFrame(() => {
         const scroll = document.querySelector('.forecast-scroll');
         if (!scroll) return;
+        const prefs = loadSectionPrefs();
         const footer = scroll.querySelector('.forecast-footer');
+
         for (const chartId of chartOrder) {
             const row = scroll.querySelector(`[data-chart-id="${chartId}"]`);
             if (row && footer) {
                 scroll.insertBefore(row, footer);
+                // Apply hidden state
+                if (prefs.hiddenCharts.includes(chartId)) {
+                    row.style.display = 'none';
+                } else {
+                    row.style.display = '';
+                }
             }
         }
+
+        // Add click handlers for chart hide buttons
+        scroll.querySelectorAll('.chart-min-btn').forEach(btn => {
+            btn.onclick = () => {
+                const chartId = btn.dataset.chartId;
+                const p = loadSectionPrefs();
+                if (!p.hiddenCharts.includes(chartId)) p.hiddenCharts.push(chartId);
+                saveSectionPrefs(p);
+                const row = btn.closest('.chart-row');
+                if (row) row.style.display = 'none';
+                renderHiddenChartsBar();
+            };
+        });
+
+        renderHiddenChartsBar();
+    });
+}
+
+const CHART_NAMES = {
+    'chart-temp': 'Temperature',
+    'chart-atmos': 'Cloud/Humidity/Pressure',
+    'chart-precip': 'Precipitation',
+    'chart-wind': 'Wind',
+};
+
+function renderHiddenChartsBar() {
+    const section = document.getElementById('daily-section');
+    if (!section) return;
+    let bar = document.getElementById('hidden-charts-bar');
+    const prefs = loadSectionPrefs();
+
+    if (prefs.hiddenCharts.length === 0) {
+        if (bar) bar.remove();
+        return;
+    }
+
+    if (!bar) {
+        bar = document.createElement('div');
+        bar.id = 'hidden-charts-bar';
+        // Insert after the h2
+        const h2 = section.querySelector('h2');
+        if (h2) h2.parentNode.insertBefore(bar, h2.nextSibling);
+        else section.prepend(bar);
+    }
+
+    bar.innerHTML = prefs.hiddenCharts.map(id =>
+        `<button class="show-section-btn" data-id="${id}">Show ${CHART_NAMES[id] || id}</button>`
+    ).join(' ');
+
+    bar.querySelectorAll('.show-section-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            const p = loadSectionPrefs();
+            p.hiddenCharts = p.hiddenCharts.filter(h => h !== id);
+            saveSectionPrefs(p);
+            const row = document.querySelector(`[data-chart-id="${id}"]`);
+            if (row) row.style.display = '';
+            renderHiddenChartsBar();
+        });
     });
 }
 
@@ -1133,7 +1310,7 @@ function renderDaily(daily, hourly) {
     function chartRow(id, height, legendHtml, leftLabels, rightLabels) {
         return `
             <div class="chart-row" data-chart-id="${id}">
-                <div class="chart-legend"><span class="chart-drag-handle" title="Drag to reorder">⠿</span>${legendHtml}</div>
+                <div class="chart-legend"><span class="chart-drag-handle" title="Drag to reorder">⠿</span>${legendHtml}<button class="chart-min-btn" data-chart-id="${id}" title="Hide chart">✕</button></div>
                 <div class="chart-row-inner">
                     <div class="chart-axis chart-axis-left">${leftLabels}</div>
                     <canvas id="${id}" width="${innerW}" height="${height}" style="display:block;width:${innerW}px;height:${height}px;"></canvas>
