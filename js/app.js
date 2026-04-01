@@ -333,12 +333,19 @@ function renderDaily(daily, hourly) {
     const avgRange = maxAvg - minAvg || 1;
 
     function tempBackground(avg) {
-        // 0 = coolest day (blue), 1 = warmest day (red)
         const t = (avg - minAvg) / avgRange;
-        // Very light pastels: cool = light blue (#e8f0fe), warm = light red (#fde8e8)
-        const r = Math.round(232 + t * 21);        // 232 -> 253
-        const g = Math.round(240 - t * 8);          // 240 -> 232
-        const b = Math.round(254 - t * 22);         // 254 -> 232
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            // Dark mode: cool = dark blue, warm = dark red
+            const r = Math.round(30 + t * 40);
+            const g = Math.round(40 - t * 10);
+            const b = Math.round(60 - t * 30);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        // Light mode: cool = light blue, warm = light red
+        const r = Math.round(214 + t * 39);
+        const g = Math.round(228 - t * 14);
+        const b = Math.round(253 - t * 39);
         return `rgb(${r}, ${g}, ${b})`;
     }
 
@@ -537,8 +544,12 @@ function drawArea(ctx, data, count, color, alpha, minVal, maxVal, w, h, pad) {
     ctx.globalAlpha = 1;
 }
 
+function isDarkMode() {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+}
+
 function drawDayDividers(ctx, count, w, h) {
-    ctx.strokeStyle = '#e5e7eb';
+    ctx.strokeStyle = isDarkMode() ? '#374151' : '#e5e7eb';
     ctx.lineWidth = 1;
     for (let i = 24; i < count; i += 24) {
         const x = (i / (count - 1)) * w;
@@ -555,7 +566,7 @@ function drawNowLine(ctx, hourly, count, w, h) {
     const hoursElapsed = (now - startTime) / (1000 * 60 * 60);
     if (hoursElapsed < 0 || hoursElapsed > count) return;
     const x = (hoursElapsed / (count - 1)) * w;
-    ctx.strokeStyle = '#1a1a1a';
+    ctx.strokeStyle = isDarkMode() ? '#9ca3af' : '#1a1a1a';
     ctx.lineWidth = 1.5;
     ctx.setLineDash([4, 3]);
     ctx.beginPath();
@@ -746,7 +757,10 @@ async function loadRadar(lat, lon) {
 
         // Map base layer
         const mapHtml = buildTileGrid(
-            (tx, ty) => `https://a.basemaps.cartocdn.com/rastertiles/voyager/${zoom}/${tx}/${ty}@2x.png`,
+            (tx, ty) => {
+                const style = isDarkMode() ? 'dark_all' : 'rastertiles/voyager';
+                return `https://a.basemaps.cartocdn.com/${style}/${zoom}/${tx}/${ty}@2x.png`;
+            },
             'opacity:0.7;'
         );
 
@@ -990,10 +1004,15 @@ function showHome() {
     searchError.hidden = true;
 }
 
-function showWeather(location) {
+function showWeather(location, query) {
     homeView.hidden = true;
     weatherView.hidden = false;
-    locationName.textContent = `${location.name}, ${location.region}`;
+    const zipMatch = query && query.trim().match(/^(\d{5})$/);
+    if (zipMatch) {
+        locationName.textContent = `${location.name}, ${location.region} (${zipMatch[1]})`;
+    } else {
+        locationName.textContent = `${location.name}, ${location.region}`;
+    }
 }
 
 searchForm.addEventListener('submit', async (e) => {
@@ -1008,7 +1027,7 @@ searchForm.addEventListener('submit', async (e) => {
     try {
         const location = await geocode(query);
         updateURL(query);
-        showWeather(location);
+        showWeather(location, query);
         fetchAllWeatherData(location.lat, location.lon);
     } catch (err) {
         searchError.textContent = err.message;
@@ -1027,24 +1046,57 @@ backBtn.addEventListener('click', () => {
 // --- URL State ---------------------------------------------------------------
 
 function updateURL(query) {
-    history.pushState(null, '', `#${encodeURIComponent(query)}`);
+    history.pushState(null, '', `?q=${encodeURIComponent(query)}`);
+}
+
+function getQueryFromURL() {
+    // Support ?q=78258, #78258, and legacy hash
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('q')) return params.get('q');
+    if (window.location.hash.length > 1) return decodeURIComponent(window.location.hash.slice(1));
+    return '';
 }
 
 window.addEventListener('popstate', () => {
-    const hash = decodeURIComponent(window.location.hash.slice(1));
-    if (hash) {
-        searchInput.value = hash;
+    const query = getQueryFromURL();
+    if (query) {
+        searchInput.value = query;
         searchForm.dispatchEvent(new Event('submit'));
     } else {
         showHome();
     }
 });
 
-// Load from URL hash on page load
+// Load from URL on page load
 (function () {
-    const hash = decodeURIComponent(window.location.hash.slice(1));
-    if (hash) {
-        searchInput.value = hash;
+    const query = getQueryFromURL();
+    if (query) {
+        searchInput.value = query;
         searchForm.dispatchEvent(new Event('submit'));
     }
+})();
+
+// --- Dark Mode ---------------------------------------------------------------
+
+(function () {
+    const toggle = document.getElementById('theme-toggle');
+    const stored = localStorage.getItem('theme');
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        toggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+        localStorage.setItem('theme', theme);
+    }
+
+    // Initialize: use stored preference, fall back to OS preference
+    if (stored) {
+        setTheme(stored);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        setTheme('dark');
+    }
+
+    toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        setTheme(current === 'dark' ? 'light' : 'dark');
+    });
 })();
