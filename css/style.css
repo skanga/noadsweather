@@ -532,6 +532,13 @@ body.is-dragging .weather-col:empty {
     .columns-row {
         flex-direction: column;
     }
+    .section-controls {
+        opacity: 1;
+    }
+    .section-width-btn,
+    .section-drag-handle {
+        display: none;
+    }
 }
 
 .current-main {
