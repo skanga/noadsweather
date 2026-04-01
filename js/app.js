@@ -1058,7 +1058,7 @@ function renderSunMoon(daily, lat, lon) {
             </div>
             <div class="astro-item">
                 <div style="font-size:1.5rem;">${moon.icon}</div>
-                <div class="label">Moon</div>
+                <div class="label">Phase</div>
                 <div class="value">${moon.name}</div>
             </div>
             <div class="astro-item">
