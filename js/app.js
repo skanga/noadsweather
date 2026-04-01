@@ -1035,26 +1035,18 @@ function renderSunMoon(daily, lat, lon) {
     const moon = getMoonPhase(now);
     const moonTimes = getMoonTimes(now, lat, lon);
 
-    // Moon date label — show range if moonset is on a different day than moonrise
-    let moonDateLabel;
-    if (moonTimes.rise && moonTimes.set) {
-        const riseDate = fmtDate(moonTimes.rise);
-        const setDate = fmtDate(moonTimes.set);
-        moonDateLabel = riseDate === setDate ? riseDate : `${riseDate} – ${setDate}`;
-    } else if (moonTimes.rise) {
-        moonDateLabel = fmtDate(moonTimes.rise);
-    } else {
-        moonDateLabel = fmtDate(now);
-    }
+    const riseDate = moonTimes.rise ? fmtDate(moonTimes.rise) : '';
+    const setDate = moonTimes.set ? fmtDate(moonTimes.set) : '';
 
     const moonSection = document.getElementById('moon-section');
     moonSection.innerHTML = `
-        <h2>Moon <span style="text-transform:none;font-weight:400;font-size:0.85rem;color:var(--text-muted);">(${moonDateLabel})</span></h2>
+        <h2>Moon</h2>
         <div class="astro-grid">
             <div class="astro-item">
                 <div style="font-size:1.5rem;">🌔</div>
                 <div class="label">Moonrise</div>
                 <div class="value">${fmtTime(moonTimes.rise)}</div>
+                <div class="label">${riseDate}</div>
             </div>
             <div class="astro-item">
                 <div style="font-size:1.5rem;">${moon.icon}</div>
@@ -1065,6 +1057,7 @@ function renderSunMoon(daily, lat, lon) {
                 <div style="font-size:1.5rem;">🌘</div>
                 <div class="label">Moonset</div>
                 <div class="value">${fmtTime(moonTimes.set)}</div>
+                <div class="label">${setDate}</div>
             </div>
         </div>
     `;
