@@ -28,6 +28,7 @@
             </form>
             <p id="search-error" class="error" hidden></p>
         </main>
+        <button id="privacy-toggle-home" class="privacy-link privacy-link-fixed">Privacy / Cookies</button>
     </div>
 
     <!-- Weather View (hidden initially) -->
@@ -49,15 +50,13 @@
                 <section id="sun-section"></section>
                 <section id="moon-section"></section>
             </div>
-            <div style="height:4rem;"></div>
+            <div class="bottom-spacer">
+                <button id="privacy-toggle-weather" class="privacy-link">Privacy / Cookies</button>
+            </div>
         </main>
     </div>
 
-    <!-- Theme toggle -->
-    <button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
-
-    <!-- Privacy toggle -->
-    <button id="privacy-toggle">Privacy / Cookies</button>
+    <!-- Privacy panel (shared, hidden by default) -->
     <div id="privacy-panel" hidden>
         <button id="privacy-close" aria-label="Close">&times;</button>
         <p><strong>No cookies. No tracking. No ads.</strong></p>
@@ -74,6 +73,9 @@
         <p>Your dark mode preference is saved in your browser's local storage (not a cookie) so it persists between visits. Pollen data is also cached locally to reduce unnecessary API calls. You can clear this anytime by clearing your browser data.</p>
         <p>This site is open source and donation-supported. No data is sold, shared, or monetized in any way. If you think this is awesome, please consider <a href="https://ko-fi.com/noadsdude" target="_blank" rel="noopener" style="color:var(--accent);">clicking here to support us</a>.</p>
     </div>
+
+    <!-- Theme toggle -->
+    <button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
 
     <!-- Floating donate button -->
     <a id="donate-btn" href="https://ko-fi.com/noadsdude" target="_blank" rel="noopener">

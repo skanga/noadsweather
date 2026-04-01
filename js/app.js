@@ -1331,20 +1331,23 @@ window.addEventListener('popstate', () => {
 
 // --- Privacy Panel -----------------------------------------------------------
 
-document.getElementById('privacy-toggle').addEventListener('click', () => {
+function togglePrivacy() {
     const panel = document.getElementById('privacy-panel');
     panel.hidden = !panel.hidden;
-});
+}
 
+document.getElementById('privacy-toggle-home').addEventListener('click', togglePrivacy);
+document.getElementById('privacy-toggle-weather').addEventListener('click', togglePrivacy);
 document.getElementById('privacy-close').addEventListener('click', () => {
     document.getElementById('privacy-panel').hidden = true;
 });
 
-// Close privacy panel when clicking outside
 document.addEventListener('click', (e) => {
     const panel = document.getElementById('privacy-panel');
-    const toggle = document.getElementById('privacy-toggle');
-    if (!panel.hidden && !panel.contains(e.target) && e.target !== toggle) {
+    if (!panel.hidden &&
+        !panel.contains(e.target) &&
+        e.target.id !== 'privacy-toggle-home' &&
+        e.target.id !== 'privacy-toggle-weather') {
         panel.hidden = true;
     }
 });
