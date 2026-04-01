@@ -1328,3 +1328,19 @@ window.addEventListener('popstate', () => {
         setTheme(current === 'dark' ? 'light' : 'dark');
     });
 })();
+
+// --- Privacy Panel -----------------------------------------------------------
+
+document.getElementById('privacy-toggle').addEventListener('click', () => {
+    const panel = document.getElementById('privacy-panel');
+    panel.hidden = !panel.hidden;
+});
+
+// Close privacy panel when clicking outside
+document.addEventListener('click', (e) => {
+    const panel = document.getElementById('privacy-panel');
+    const toggle = document.getElementById('privacy-toggle');
+    if (!panel.hidden && !panel.contains(e.target) && e.target !== toggle) {
+        panel.hidden = true;
+    }
+});

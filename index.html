@@ -56,6 +56,24 @@
     <!-- Theme toggle -->
     <button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
 
+    <!-- Privacy toggle -->
+    <button id="privacy-toggle">Privacy / Cookies</button>
+    <div id="privacy-panel" hidden>
+        <p><strong>No cookies. No tracking. No ads.</strong></p>
+        <p>This site does not use cookies, does not track your location, and does not collect any personal information. We don't use analytics, fingerprinting, or any form of user tracking.</p>
+        <p>When you search for a city or zip code, the coordinates of that location (not your personal location) are sent to the following third-party services to retrieve weather data:</p>
+        <ul>
+            <li><strong>Open-Meteo</strong> — weather forecasts and air quality data</li>
+            <li><strong>National Weather Service (NWS)</strong> — severe weather alerts (US only)</li>
+            <li><strong>RainViewer</strong> — radar imagery</li>
+            <li><strong>Google Pollen API</strong> — pollen data (only when you click "See pollen data")</li>
+            <li><strong>Zippopotam</strong> — zip code to coordinates (US zip codes only)</li>
+            <li><strong>CartoDB</strong> — map tiles for radar display</li>
+        </ul>
+        <p>Your dark mode preference is saved in your browser's local storage (not a cookie) so it persists between visits. Pollen data is also cached locally to reduce unnecessary API calls. You can clear this anytime by clearing your browser data.</p>
+        <p>This site is open source and donation-supported. No data is sold, shared, or monetized in any way. If you think this is awesome, please consider <a href="https://ko-fi.com/noadsdude" target="_blank" rel="noopener" style="color:var(--accent);">clicking here to support us</a>.</p>
+    </div>
+
     <!-- Floating donate button -->
     <a id="donate-btn" href="https://ko-fi.com/noadsdude" target="_blank" rel="noopener">
         Support this site

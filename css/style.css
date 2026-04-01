@@ -179,6 +179,58 @@ body {
     transform: translateY(-1px);
 }
 
+/* Privacy toggle */
+#privacy-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    z-index: 1000;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+#privacy-toggle:hover {
+    color: var(--text);
+}
+
+#privacy-panel {
+    position: fixed;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 60vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1001;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+#privacy-panel p {
+    margin-bottom: 0.75rem;
+}
+
+#privacy-panel ul {
+    margin: 0 0 0.75rem 1.25rem;
+}
+
+#privacy-panel li {
+    margin-bottom: 0.25rem;
+}
+
 /* Weather View */
 .weather-header {
     display: flex;
