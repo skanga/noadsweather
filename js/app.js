@@ -722,33 +722,135 @@ async function geocodeFetch(name) {
 
 // Postal code patterns by country (Zippopotam supports 60+ countries)
 const POSTAL_PATTERNS = [
-    { regex: /^(\d{5})$/, country: 'us', name: 'United States' },                    // US: 90210
-    { regex: /^(\d{5})$/, country: 'de', name: 'Germany' },                           // DE: 10115 (same format as US, tried after US)
-    { regex: /^([A-Z]\d[A-Z]\s?\d[A-Z]\d)$/i, country: 'ca', name: 'Canada' },       // CA: K1A 0B1
-    { regex: /^([A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i, country: 'gb', name: 'United Kingdom' }, // UK: SW1A 1AA
-    { regex: /^(\d{4})$/, country: 'au', name: 'Australia' },                         // AU: 2000
-    { regex: /^(\d{5}-\d{3})$/, country: 'br', name: 'Brazil' },                      // BR: 01001-000
-    { regex: /^(\d{3}-\d{4})$/, country: 'jp', name: 'Japan' },                       // JP: 100-0001
-    { regex: /^(\d{5})$/, country: 'fr', name: 'France' },                            // FR: 75001
-    { regex: /^(\d{5})$/, country: 'es', name: 'Spain' },                             // ES: 28001
-    { regex: /^(\d{5})$/, country: 'it', name: 'Italy' },                             // IT: 00100
-    { regex: /^(\d{4}\s?[A-Z]{2})$/i, country: 'nl', name: 'Netherlands' },           // NL: 1012 AB
-    { regex: /^(\d{4})$/, country: 'nz', name: 'New Zealand' },                       // NZ: 6011
-    { regex: /^(\d{2}-\d{3})$/, country: 'pl', name: 'Poland' },                      // PL: 00-001
-    { regex: /^(\d{4})$/, country: 'za', name: 'South Africa' },                      // ZA: 2000
-    { regex: /^(\d{6})$/, country: 'in', name: 'India' },                             // IN: 110001
-    { regex: /^(\d{5})$/, country: 'mx', name: 'Mexico' },                            // MX: 06600
+    // 5-digit countries (most common — picker shown if ambiguous)
+    { regex: /^(\d{5})$/, country: 'us', name: 'United States' },
+    { regex: /^(\d{5})$/, country: 'de', name: 'Germany' },
+    { regex: /^(\d{5})$/, country: 'fr', name: 'France' },
+    { regex: /^(\d{5})$/, country: 'es', name: 'Spain' },
+    { regex: /^(\d{5})$/, country: 'it', name: 'Italy' },
+    { regex: /^(\d{5})$/, country: 'mx', name: 'Mexico' },
+    { regex: /^(\d{5})$/, country: 'fi', name: 'Finland' },
+    { regex: /^(\d{5})$/, country: 'se', name: 'Sweden' },
+    { regex: /^(\d{5})$/, country: 'hr', name: 'Croatia' },
+    { regex: /^(\d{5})$/, country: 'tr', name: 'Turkey' },
+    { regex: /^(\d{5})$/, country: 'pk', name: 'Pakistan' },
+    { regex: /^(\d{5})$/, country: 'my', name: 'Malaysia' },
+    { regex: /^(\d{5})$/, country: 'th', name: 'Thailand' },
+    { regex: /^(\d{5})$/, country: 'gt', name: 'Guatemala' },
+    { regex: /^(\d{5})$/, country: 'lt', name: 'Lithuania' },
+    { regex: /^(\d{5})$/, country: 'do', name: 'Dominican Republic' },
+    { regex: /^(\d{5})$/, country: 'mc', name: 'Monaco' },
+    { regex: /^(\d{5})$/, country: 'sm', name: 'San Marino' },
+    // 4-digit countries
+    { regex: /^(\d{4})$/, country: 'au', name: 'Australia' },
+    { regex: /^(\d{4})$/, country: 'nz', name: 'New Zealand' },
+    { regex: /^(\d{4})$/, country: 'za', name: 'South Africa' },
+    { regex: /^(\d{4})$/, country: 'at', name: 'Austria' },
+    { regex: /^(\d{4})$/, country: 'be', name: 'Belgium' },
+    { regex: /^(\d{4})$/, country: 'ch', name: 'Switzerland' },
+    { regex: /^(\d{4})$/, country: 'dk', name: 'Denmark' },
+    { regex: /^(\d{4})$/, country: 'no', name: 'Norway' },
+    { regex: /^(\d{4})$/, country: 'bg', name: 'Bulgaria' },
+    { regex: /^(\d{4})$/, country: 'hu', name: 'Hungary' },
+    { regex: /^(\d{4})$/, country: 'si', name: 'Slovenia' },
+    { regex: /^(\d{4})$/, country: 'li', name: 'Liechtenstein' },
+    { regex: /^(\d{4})$/, country: 'mk', name: 'North Macedonia' },
+    { regex: /^(\d{4})$/, country: 'bd', name: 'Bangladesh' },
+    { regex: /^(\d{4})$/, country: 'ph', name: 'Philippines' },
+    { regex: /^(\d{4})$/, country: 'gl', name: 'Greenland' },
+    // 6-digit countries
+    { regex: /^(\d{6})$/, country: 'in', name: 'India' },
+    { regex: /^(\d{6})$/, country: 'ru', name: 'Russia' },
+    // 3-digit countries
+    { regex: /^(\d{3})$/, country: 'is', name: 'Iceland' },
+    { regex: /^(\d{3})$/, country: 'fo', name: 'Faroe Islands' },
+    // Unique formats
+    { regex: /^([A-Z]\d[A-Z]\s?\d[A-Z]\d)$/i, country: 'ca', name: 'Canada' },       // K1A 0B1
+    { regex: /^([A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i, country: 'gb', name: 'United Kingdom' }, // SW1A 1AA
+    { regex: /^(\d{4}\s?[A-Z]{2})$/i, country: 'nl', name: 'Netherlands' },           // 1012 AB
+    { regex: /^(\d{5}-\d{3})$/, country: 'br', name: 'Brazil' },                      // 01001-000
+    { regex: /^(\d{3}-\d{4})$/, country: 'jp', name: 'Japan' },                       // 100-0001
+    { regex: /^(\d{2}-\d{3})$/, country: 'pl', name: 'Poland' },                      // 00-001
+    { regex: /^(\d{4}-\d{3})$/, country: 'pt', name: 'Portugal' },                    // 1000-001
+    { regex: /^(\d{3}\s?\d{2})$/, country: 'cz', name: 'Czech Republic' },            // 100 00
+    { regex: /^(AD\d{3})$/i, country: 'ad', name: 'Andorra' },                        // AD100
+    { regex: /^([A-Z]\d[\dW]\s?[A-Z\d]{4})$/i, country: 'ie', name: 'Ireland' },     // V94 X293
+    // Channel Islands / Crown Dependencies (UK-style short codes)
+    { regex: /^(GY\d{1,2})$/i, country: 'gg', name: 'Guernsey' },                    // GY1
+    { regex: /^(JE\d{1,2})$/i, country: 'je', name: 'Jersey' },                      // JE1
+    { regex: /^(IM\d{1,2})$/i, country: 'im', name: 'Isle of Man' },                  // IM1
 ];
 
+// Irish Eircode routing keys → city names (for geocoding fallback since Zippopotam doesn't support Ireland)
+const EIRCODE_ROUTING = {
+    A41:'Letterkenny',A42:'Donegal',A45:'Kells',A63:'Navan',A67:'Navan',A75:'Drogheda',
+    A81:'Drogheda',A82:'Dundalk',A83:'Dundalk',A84:'Dundalk',A85:'Dundalk',A86:'Dundalk',
+    A91:'Galway',A92:'Drogheda',A94:'Blackrock',A96:'Glenageary',A98:'Bray',
+    C15:'Maynooth',D01:'Dublin 1',D02:'Dublin 2',D03:'Dublin 3',D04:'Dublin 4',
+    D05:'Dublin 5',D06:'Dublin 6',D06W:'Dublin 6W',D07:'Dublin 7',D08:'Dublin 8',
+    D09:'Dublin 9',D10:'Dublin 10',D11:'Dublin 11',D12:'Dublin 12',D13:'Dublin 13',
+    D14:'Dublin 14',D15:'Dublin 15',D16:'Dublin 16',D17:'Dublin 17',D18:'Dublin 18',
+    D20:'Dublin 20',D22:'Dublin 22',D24:'Dublin 24',E21:'Roscrea',E25:'Thurles',
+    E32:'Tipperary',E34:'Cashel',E41:'Portlaoise',E45:'Nenagh',E53:'Birr',
+    E91:'Carlow',F12:'Castlebar',F23:'Westport',F26:'Ballina',F28:'Claremorris',
+    F31:'Roscommon',F35:'Longford',F42:'Athlone',F45:'Ballinasloe',F52:'Tuam',
+    F56:'Clifden',F91:'Galway',F92:'Galway',F93:'Loughrea',F94:'Donegal',
+    H12:'Mullingar',H14:'Cavan',H16:'Virginia',H18:'Oldcastle',H23:'Carrickmacross',
+    H53:'Monaghan',H54:'Clones',H62:'Edenderry',H65:'Tullamore',H71:'Moate',
+    H91:'Galway',K32:'Swords',K34:'Skerries',K36:'Celbridge',K45:'Naas',
+    K56:'Athy',K67:'Newbridge',K78:'Kildare',N37:'Athlone',N39:'Moate',
+    N41:'Castlepollard',N91:'Longford',P12:'Cork',P14:'Cork',P17:'Cobh',
+    P24:'Youghal',P25:'Fermoy',P31:'Cork',P32:'Midleton',P36:'Macroom',
+    P43:'Mallow',P47:'Kanturk',P51:'Cork',P56:'Bandon',P61:'Kinsale',
+    P67:'Bantry',P72:'Clonakilty',P75:'Skibbereen',P81:'Dunmanway',P85:'Millstreet',
+    R14:'Gorey',R21:'Arklow',R32:'Enniscorthy',R35:'Dungarvan',R42:'Wexford',
+    R45:'Waterford',R51:'Kilkenny',R56:'New Ross',R65:'Waterford',R93:'Carlow',
+    R95:'Kilkenny',T12:'Cork',T23:'Cork',T34:'Mitchelstown',T45:'Charleville',
+    T56:'Cahir',V14:'Killorglin',V15:'Tralee',V23:'Tralee',V31:'Killarney',
+    V35:'Kenmare',V42:'Newcastle West',V92:'Limerick',V93:'Limerick',V94:'Limerick',
+    V95:'Adare',W12:'Wicklow',W23:'Baltinglass',W34:'Blessington',W91:'Clonmel',
+    X35:'Dungarvan',X42:'Waterford',X91:'Waterford',Y14:'Enniscorthy',Y21:'Arklow',
+    Y25:'Gorey',Y34:'New Ross',Y35:'Wexford',
+};
+
 async function geocodePostal(code, countryCode, countryName) {
-    // UK postcodes: Zippopotam only accepts the outcode (first part, e.g. "OX1" not "OX1 1AB")
-    let lookupCode = code;
-    if (countryCode === 'gb') {
-        lookupCode = code.trim().split(/\s+/)[0];
+    // Ireland: Zippopotam doesn't support Eircodes — use routing key lookup + Open-Meteo
+    if (countryCode === 'ie') {
+        const routingKey = code.trim().replace(/\s/g, '').substring(0, 3).toUpperCase();
+        const city = EIRCODE_ROUTING[routingKey];
+        if (!city) return null;
+        const data = await geocodeFetch(city);
+        if (!data.results || data.results.length === 0) return null;
+        // Filter for Ireland results
+        const irish = data.results.find(r => r.country_code === 'IE' || r.country === 'Ireland');
+        const r = irish || data.results[0];
+        return {
+            name: city,
+            region: r.admin1 || '',
+            country: 'Ireland',
+            lat: r.latitude,
+            lon: r.longitude,
+        };
     }
-    // NL postcodes: strip space (e.g. "1012 AB" → "1012AB")
-    if (countryCode === 'nl') {
-        lookupCode = code.replace(/\s/g, '');
+
+    // Some countries need code transformation for Zippopotam
+    let lookupCode = code.trim();
+    if (countryCode === 'gb') {
+        // UK: Zippopotam only accepts outcode (first part, e.g. "OX1" not "OX1 1AB")
+        lookupCode = lookupCode.split(/\s+/)[0];
+    } else if (countryCode === 'ca') {
+        // Canada: Zippopotam only accepts FSA (first 3 chars, e.g. "H4N" not "H4N 2E7")
+        lookupCode = lookupCode.replace(/\s/g, '').substring(0, 3);
+    } else if (countryCode === 'nl') {
+        // NL: Zippopotam only accepts the 4-digit numeric prefix (e.g. "1012 AB" → "1012")
+        lookupCode = lookupCode.replace(/\s/g, '').substring(0, 4);
+    } else if (countryCode === 'cz') {
+        // CZ: Zippopotam expects space-separated format (e.g. "10000" → "100 00")
+        lookupCode = lookupCode.replace(/\s/g, '');
+        if (lookupCode.length === 5) lookupCode = lookupCode.substring(0, 3) + ' ' + lookupCode.substring(3);
+    } else if (countryCode === 'gg' || countryCode === 'je' || countryCode === 'im') {
+        // Channel Islands: use just the prefix code as-is
+        lookupCode = lookupCode.toUpperCase();
     }
 
     const res = await fetch(`https://api.zippopotam.us/${countryCode}/${encodeURIComponent(lookupCode)}`);
@@ -768,20 +870,8 @@ async function geocodePostal(code, countryCode, countryName) {
     };
 }
 
-async function geocodeZip(query) {
-    const trimmed = query.trim();
-
-    // Check if user prefixed with country code, e.g. "DE 10115" or "UK SW1A 1AA"
-    const prefixMatch = trimmed.match(/^([A-Z]{2})\s+(.+)$/i);
-    if (prefixMatch) {
-        const cc = prefixMatch[1].toLowerCase();
-        const code = prefixMatch[2];
-        const pattern = POSTAL_PATTERNS.find(p => p.country === cc);
-        if (pattern) {
-            const result = await geocodePostal(code, cc, pattern.name);
-            if (result) return result;
-        }
-    }
+async function geocodeZipInner(code) {
+    const trimmed = code.trim();
 
     // Find all matching country patterns for this postal code
     const matchingPatterns = [];
@@ -809,6 +899,27 @@ async function geocodeZip(query) {
 
     // Multiple valid results — show picker
     return showLocationPicker(validResults);
+}
+
+async function geocodeZip(query) {
+    const trimmed = query.trim();
+
+    // Check if user prefixed with country code, e.g. "DE 10115" or "UK SW1A 1AA"
+    const prefixMatch = trimmed.match(/^([A-Z]{2})\s+(.+)$/i);
+    if (prefixMatch) {
+        const cc = prefixMatch[1].toLowerCase();
+        const code = prefixMatch[2];
+        const pattern = POSTAL_PATTERNS.find(p => p.country === cc);
+        if (pattern) {
+            const result = await geocodePostal(code, cc, pattern.name);
+            if (result) return result;
+        }
+        // Prefix might be a province/state code (e.g. "QC H4N 2E7") — try the rest as a postal code
+        const restResult = await geocodeZipInner(code);
+        if (restResult) return restResult;
+    }
+
+    return await geocodeZipInner(trimmed);
 }
 
 async function geocode(query) {
@@ -2024,12 +2135,15 @@ function showHome() {
 function showWeather(location, query) {
     homeView.hidden = true;
     weatherView.hidden = false;
-    const zipMatch = query && query.trim().match(/^(\d{5})$/);
-    if (zipMatch) {
-        locationName.textContent = `${location.name}, ${location.region} (${zipMatch[1]})`;
-    } else {
-        locationName.textContent = `${location.name}, ${location.region}`;
+    // Build location label: "City, Region" or "City, Country" if no region
+    const secondary = location.region || location.country || '';
+    let label = secondary ? `${location.name}, ${secondary}` : location.name;
+    // Append postal code if the query looks like one
+    const postalMatch = query && query.trim().match(/^[\dA-Z][\dA-Z\s\-]{2,}$/i);
+    if (postalMatch) {
+        label += ` (${query.trim()})`;
     }
+    locationName.textContent = label;
 }
 
 searchForm.addEventListener('submit', async (e) => {
