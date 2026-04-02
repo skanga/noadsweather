@@ -875,6 +875,22 @@ body.is-dragging .weather-col:empty {
 }
 
 /* Radar */
+.radar-refresh-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    vertical-align: middle;
+    margin-left: 0.3rem;
+    transition: transform 0.3s;
+}
+
+.radar-refresh-btn:hover {
+    color: var(--text);
+    transform: rotate(180deg);
+}
+
 #radar-section img {
     width: 100%;
     border-radius: 8px;

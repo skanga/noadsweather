@@ -1815,13 +1815,20 @@ function renderRadar(lat, lon) {
 
     const section = document.getElementById('radar-section');
     section.innerHTML = `
-        <h2>Radar</h2>
+        <h2>Radar <button id="radar-refresh" class="radar-refresh-btn" title="Refresh radar">↻</button></h2>
         <div id="radar-container" style="position:relative;width:100%;aspect-ratio:1;background:#1a1a2e;border-radius:8px;overflow:hidden;">
             <div class="loading" style="color:#9ca3af;">Loading radar...</div>
         </div>
         <div id="radar-time" style="text-align:center;font-size:0.8rem;color:#6b7280;margin-top:0.5rem;"></div>
     `;
     loadRadar(lat, lon);
+
+    document.getElementById('radar-refresh').addEventListener('click', () => {
+        if (radarInterval) { clearInterval(radarInterval); radarInterval = null; }
+        document.getElementById('radar-container').innerHTML = '<div class="loading" style="color:#9ca3af;">Refreshing radar...</div>';
+        document.getElementById('radar-time').textContent = '';
+        loadRadar(lat, lon);
+    });
 }
 
 async function loadRadar(lat, lon) {
@@ -1919,7 +1926,7 @@ async function loadRadar(lat, lon) {
     }
 }
 
-function renderSunMoon(daily, lat, lon) {
+function renderSunMoon(daily, lat, lon, utcOffsetSeconds) {
     const fmtTime = fmtTimeUnit;
 
     const fmtDate = (d) => {
@@ -1955,35 +1962,55 @@ function renderSunMoon(daily, lat, lon) {
         </div>
     `;
 
-    // Moon
-    const now = new Date();
-    const moon = getMoonPhase(now);
-    const moonTimes = getMoonTimes(now, lat, lon);
+    // Moon — calculate in UTC using the searched location's timezone offset
+    const utcOffsetMs = (utcOffsetSeconds || 0) * 1000;
+    const moon = getMoonPhase(new Date());
+    const moonTimes = getMoonTimes(lat, lon, utcOffsetMs);
 
     const riseDate = moonTimes.rise ? fmtDate(moonTimes.rise) : '';
     const setDate = moonTimes.set ? fmtDate(moonTimes.set) : '';
 
     const moonSection = document.getElementById('moon-section');
-    moonSection.innerHTML = `
-        <h2>Moon</h2>
-        <div class="astro-grid">
-            <div class="astro-item">
+
+    // If moon is currently up, show Moonset first (next event), then Moonrise (after that)
+    const firstItem = moonTimes.moonIsUp
+        ? `<div class="astro-item">
+                <div style="font-size:1.5rem;">🌘</div>
+                <div class="label">Moonset</div>
+                <div class="value">${fmtTime(moonTimes.set)}</div>
+                <div class="label">${setDate}</div>
+           </div>`
+        : `<div class="astro-item">
                 <div style="font-size:1.5rem;">🌔</div>
                 <div class="label">Moonrise</div>
                 <div class="value">${fmtTime(moonTimes.rise)}</div>
                 <div class="label">${riseDate}</div>
-            </div>
+           </div>`;
+
+    const lastItem = moonTimes.moonIsUp
+        ? `<div class="astro-item">
+                <div style="font-size:1.5rem;">🌔</div>
+                <div class="label">Moonrise</div>
+                <div class="value">${fmtTime(moonTimes.rise)}</div>
+                <div class="label">${riseDate}</div>
+           </div>`
+        : `<div class="astro-item">
+                <div style="font-size:1.5rem;">🌘</div>
+                <div class="label">Moonset</div>
+                <div class="value">${fmtTime(moonTimes.set)}</div>
+                <div class="label">${setDate}</div>
+           </div>`;
+
+    moonSection.innerHTML = `
+        <h2>Moon</h2>
+        <div class="astro-grid">
+            ${firstItem}
             <div class="astro-item">
                 <div style="font-size:1.5rem;">${moon.icon}</div>
                 <div class="label">Phase</div>
                 <div class="value">${moon.name}</div>
             </div>
-            <div class="astro-item">
-                <div style="font-size:1.5rem;">🌘</div>
-                <div class="label">Moonset</div>
-                <div class="value">${fmtTime(moonTimes.set)}</div>
-                <div class="label">${setDate}</div>
-            </div>
+            ${lastItem}
         </div>
     `;
 }
@@ -1991,35 +2018,51 @@ function renderSunMoon(daily, lat, lon) {
 // --- Moonrise/Moonset calculation ---
 // Simplified algorithm based on Jean Meeus "Astronomical Algorithms"
 
-function getMoonTimes(date, lat, lon) {
-    // Find first moonrise from start of day, then first moonset after that rise
-    const rise = findMoonEvent(date, lat, lon, 'rise', 1440);
-    const searchStart = rise || date;
-    const set = findMoonEvent(searchStart, lat, lon, 'set', 1440);
-    return { rise, set };
+function getMoonTimes(lat, lon, utcOffsetMs) {
+    // Calculate local midnight and "now" at the searched location as UTC timestamps
+    const nowUtc = Date.now();
+    const localNowMs = nowUtc + utcOffsetMs;
+    const localMidnightMs = localNowMs - (localNowMs % 86400000);
+    const utcMidnight = localMidnightMs - utcOffsetMs;
+
+    const toLocal = (d) => d ? new Date(d.getTime() + utcOffsetMs + new Date().getTimezoneOffset() * 60000) : null;
+
+    // Check if the moon is currently above the horizon
+    const currentAlt = moonAltitude(new Date(nowUtc), lat, lon);
+    const moonIsUp = currentAlt > -0.833;
+
+    if (moonIsUp) {
+        // Moon is currently up — find next set, then next rise after that
+        const set = findMoonEvent(nowUtc, lat, lon, 'set', 1440);
+        const riseAfter = findMoonEvent(set ? set.getTime() : nowUtc, lat, lon, 'rise', 1440);
+        return { rise: toLocal(riseAfter), set: toLocal(set), moonIsUp: true };
+    } else {
+        // Moon is currently down — find next rise, then next set after that
+        const rise = findMoonEvent(nowUtc, lat, lon, 'rise', 1440);
+        const setAfter = findMoonEvent(rise ? rise.getTime() : nowUtc, lat, lon, 'set', 1440);
+        return { rise: toLocal(rise), set: toLocal(setAfter), moonIsUp: false };
+    }
 }
 
-function findMoonEvent(date, lat, lon, type, maxMinutes) {
-    const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const startTime = (type === 'set' && date > startOfDay) ? date : startOfDay;
-
+function findMoonEvent(startUtcMs, lat, lon, type, maxMinutes) {
+    const startTime = new Date(startUtcMs);
     let prevAlt = moonAltitude(startTime, lat, lon);
 
     for (let m = 10; m <= maxMinutes; m += 10) {
-        const t = new Date(startTime.getTime() + m * 60000);
+        const t = new Date(startUtcMs + m * 60000);
         const alt = moonAltitude(t, lat, lon);
 
         if (type === 'rise' && prevAlt < -0.833 && alt >= -0.833) {
             const frac = (0 - prevAlt) / (alt - prevAlt);
-            return new Date(startTime.getTime() + (m - 10 + frac * 10) * 60000);
+            return new Date(startUtcMs + (m - 10 + frac * 10) * 60000);
         }
         if (type === 'set' && prevAlt >= -0.833 && alt < -0.833) {
             const frac = (0 - prevAlt) / (alt - prevAlt);
-            return new Date(startTime.getTime() + (m - 10 + frac * 10) * 60000);
+            return new Date(startUtcMs + (m - 10 + frac * 10) * 60000);
         }
         prevAlt = alt;
     }
-    return null; // Moon doesn't rise/set today
+    return null;
 }
 
 function moonAltitude(date, lat, lon) {
@@ -2115,7 +2158,7 @@ async function fetchAllWeatherData(lat, lon) {
         renderDaily(meteo.daily, meteo.hourly);
         renderAlerts(alerts);
         renderRadar(lat, lon);
-        renderSunMoon(meteo.daily, lat, lon);
+        renderSunMoon(meteo.daily, lat, lon, meteo.utc_offset_seconds);
         applySectionPreferences();
     } catch (err) {
         document.getElementById('current-section').innerHTML =
