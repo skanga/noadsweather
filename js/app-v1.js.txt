@@ -720,26 +720,101 @@ async function geocodeFetch(name) {
     return res.json();
 }
 
-async function geocodeZip(zip) {
-    const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
-    if (!res.ok) throw new Error('Zip code not found. Try a city name instead.');
+// Postal code patterns by country (Zippopotam supports 60+ countries)
+const POSTAL_PATTERNS = [
+    { regex: /^(\d{5})$/, country: 'us', name: 'United States' },                    // US: 90210
+    { regex: /^(\d{5})$/, country: 'de', name: 'Germany' },                           // DE: 10115 (same format as US, tried after US)
+    { regex: /^([A-Z]\d[A-Z]\s?\d[A-Z]\d)$/i, country: 'ca', name: 'Canada' },       // CA: K1A 0B1
+    { regex: /^([A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})$/i, country: 'gb', name: 'United Kingdom' }, // UK: SW1A 1AA
+    { regex: /^(\d{4})$/, country: 'au', name: 'Australia' },                         // AU: 2000
+    { regex: /^(\d{5}-\d{3})$/, country: 'br', name: 'Brazil' },                      // BR: 01001-000
+    { regex: /^(\d{3}-\d{4})$/, country: 'jp', name: 'Japan' },                       // JP: 100-0001
+    { regex: /^(\d{5})$/, country: 'fr', name: 'France' },                            // FR: 75001
+    { regex: /^(\d{5})$/, country: 'es', name: 'Spain' },                             // ES: 28001
+    { regex: /^(\d{5})$/, country: 'it', name: 'Italy' },                             // IT: 00100
+    { regex: /^(\d{4}\s?[A-Z]{2})$/i, country: 'nl', name: 'Netherlands' },           // NL: 1012 AB
+    { regex: /^(\d{4})$/, country: 'nz', name: 'New Zealand' },                       // NZ: 6011
+    { regex: /^(\d{2}-\d{3})$/, country: 'pl', name: 'Poland' },                      // PL: 00-001
+    { regex: /^(\d{4})$/, country: 'za', name: 'South Africa' },                      // ZA: 2000
+    { regex: /^(\d{6})$/, country: 'in', name: 'India' },                             // IN: 110001
+    { regex: /^(\d{5})$/, country: 'mx', name: 'Mexico' },                            // MX: 06600
+];
+
+async function geocodePostal(code, countryCode, countryName) {
+    // UK postcodes: Zippopotam only accepts the outcode (first part, e.g. "OX1" not "OX1 1AB")
+    let lookupCode = code;
+    if (countryCode === 'gb') {
+        lookupCode = code.trim().split(/\s+/)[0];
+    }
+    // NL postcodes: strip space (e.g. "1012 AB" → "1012AB")
+    if (countryCode === 'nl') {
+        lookupCode = code.replace(/\s/g, '');
+    }
+
+    const res = await fetch(`https://api.zippopotam.us/${countryCode}/${encodeURIComponent(lookupCode)}`);
+    if (!res.ok) return null;
     const data = await res.json();
-    const place = data.places[0];
+    if (!data.places || data.places.length === 0) return null;
+    // Pick the best place name — prefer a larger/recognizable city if multiple places returned
+    // Use the last place (Zippopotam often puts the main city last) or the one matching the postcode area
+    const places = data.places;
+    const place = places.length > 1 ? places[places.length - 1] : places[0];
     return {
         name: place['place name'],
-        region: place['state abbreviation'],
-        country: 'United States',
+        region: place['state abbreviation'] || place['state'] || '',
+        country: countryName,
         lat: parseFloat(place.latitude),
         lon: parseFloat(place.longitude),
     };
 }
 
-async function geocode(query) {
-    // Check if input is a US zip code (5 digits)
-    const zipMatch = query.trim().match(/^(\d{5})$/);
-    if (zipMatch) {
-        return geocodeZip(zipMatch[1]);
+async function geocodeZip(query) {
+    const trimmed = query.trim();
+
+    // Check if user prefixed with country code, e.g. "DE 10115" or "UK SW1A 1AA"
+    const prefixMatch = trimmed.match(/^([A-Z]{2})\s+(.+)$/i);
+    if (prefixMatch) {
+        const cc = prefixMatch[1].toLowerCase();
+        const code = prefixMatch[2];
+        const pattern = POSTAL_PATTERNS.find(p => p.country === cc);
+        if (pattern) {
+            const result = await geocodePostal(code, cc, pattern.name);
+            if (result) return result;
+        }
     }
+
+    // Find all matching country patterns for this postal code
+    const matchingPatterns = [];
+    for (const p of POSTAL_PATTERNS) {
+        if (p.regex.test(trimmed)) {
+            matchingPatterns.push(p);
+        }
+    }
+
+    if (matchingPatterns.length === 0) return null;
+
+    // If only one country matches the format, just try it
+    if (matchingPatterns.length === 1) {
+        return await geocodePostal(trimmed, matchingPatterns[0].country, matchingPatterns[0].name);
+    }
+
+    // Multiple countries match — fetch all in parallel and show picker
+    const results = await Promise.all(
+        matchingPatterns.map(p => geocodePostal(trimmed, p.country, p.name))
+    );
+    const validResults = results.filter(r => r !== null);
+
+    if (validResults.length === 0) return null;
+    if (validResults.length === 1) return validResults[0];
+
+    // Multiple valid results — show picker
+    return showLocationPicker(validResults);
+}
+
+async function geocode(query) {
+    // Check if input looks like a postal code
+    const postal = await geocodeZip(query);
+    if (postal) return postal;
 
     // Parse city and region filter from input
     // Supports: "Austin, TX", "Austin,TX", "Austin TX", "Austin"
