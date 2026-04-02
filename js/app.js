@@ -320,17 +320,20 @@ function injectSectionControls() {
             }
         });
 
-        // Click minimized section to expand
-        el.addEventListener('click', (e) => {
-            if (!el.classList.contains('section-minimized')) return;
-            if (e.target.closest('.section-controls')) return;
-            const p = loadSectionPrefs();
-            el.classList.remove('section-minimized');
-            p.minimized = p.minimized.filter(x => x !== id);
-            saveSectionPrefs(p);
-            controls.querySelector('.section-min-btn').textContent = '−';
-            controls.querySelector('.section-min-btn').title = 'Minimize section';
-        });
+        // Click minimized section to expand — only add listener once
+        if (!el._expandListenerAdded) {
+            el._expandListenerAdded = true;
+            el.addEventListener('click', (e) => {
+                if (!el.classList.contains('section-minimized')) return;
+                if (e.target.closest('.section-controls')) return;
+                const p = loadSectionPrefs();
+                el.classList.remove('section-minimized');
+                p.minimized = p.minimized.filter(x => x !== id);
+                saveSectionPrefs(p);
+                const btn = el.querySelector('.section-min-btn');
+                if (btn) { btn.textContent = '−'; btn.title = 'Minimize section'; }
+            });
+        }
     }
 }
 
