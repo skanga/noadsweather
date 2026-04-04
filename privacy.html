@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy — NoAdsWeather</title>
+    <meta name="description" content="NoAdsWeather privacy policy. No cookies, no tracking, no ads.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛅</text></svg>">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .privacy-page {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text);
+        }
+        .privacy-page h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .privacy-page p {
+            margin-bottom: 0.75rem;
+        }
+        .privacy-page ul {
+            margin: 0 0 0.75rem 1.25rem;
+        }
+        .privacy-page li {
+            margin-bottom: 0.25rem;
+        }
+        .privacy-page a {
+            color: var(--accent);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <div class="privacy-page">
+        <a href="/" class="back-link">&larr; Back to NoAdsWeather</a>
+        <h1>Privacy Policy</h1>
+        <p><strong>No cookies. No tracking. No ads.</strong></p>
+        <p>This site does not use cookies, does not track your location, and does not collect any personal information. We don't use analytics, fingerprinting, or any form of user tracking.</p>
+        <p>When you search for a city or zip code, the coordinates of that location (not your personal location) are sent to the following third-party services to retrieve weather data:</p>
+        <ul>
+            <li><strong>Open-Meteo</strong> — weather forecasts and air quality data</li>
+            <li><strong>National Weather Service (NWS)</strong> — severe weather alerts (US only)</li>
+            <li><strong>RainViewer</strong> — radar imagery</li>
+            <li><strong>Google Pollen API</strong> — pollen data (only when you click "See pollen data")</li>
+            <li><strong>Zippopotam</strong> — postal/zip code to coordinates (60+ countries)</li>
+            <li><strong>CartoDB</strong> — map tiles for radar display</li>
+        </ul>
+        <p>Your preferences (dark mode, temperature units, time format, and section layout) are saved in your browser's local storage (not a cookie) so they persist between visits. Pollen data is also cached locally to reduce unnecessary API calls. You can clear all of this anytime by clearing your browser data.</p>
+        <p>Your phone might ask you to "Install this page", which means creating a shortcut to a website on your home screen, known as a Progressive Web App (PWA). This makes the site act like a native app, allowing it to load faster, and appear with your other apps on your home screen.</p>
+        <p>This site is open source and supported by tips from our visitors. No data is sold, shared, or monetized in any way. If you think this is awesome, please consider <a href="https://ko-fi.com/noadsdude" target="_blank" rel="noopener">clicking here to support us</a>.</p>
+    </div>
+    <script>
+        // Apply saved theme
+        const theme = localStorage.getItem('theme') ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+</body>
+</html>
