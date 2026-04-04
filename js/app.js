@@ -2415,20 +2415,19 @@ function applySettings() {
 }
 
 // Toggle popover
-document.getElementById('settings-toggle').addEventListener('click', (e) => {
-    e.stopPropagation();
+document.getElementById('settings-toggle').addEventListener('click', () => {
     const popover = document.getElementById('settings-popover');
     popover.hidden = !popover.hidden;
 });
 
-// Prevent clicks inside popover from closing it
-document.getElementById('settings-popover').addEventListener('click', (e) => {
-    e.stopPropagation();
-});
-
 // Close on outside click
-document.addEventListener('click', () => {
-    document.getElementById('settings-popover').hidden = true;
+document.addEventListener('click', (e) => {
+    const popover = document.getElementById('settings-popover');
+    if (!popover.hidden &&
+        !popover.contains(e.target) &&
+        e.target.id !== 'settings-toggle') {
+        popover.hidden = true;
+    }
 });
 
 // Close on Escape
