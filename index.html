@@ -37,22 +37,24 @@
     <!-- Weather View (hidden initially) -->
     <div id="weather-view" class="view" hidden>
         <header class="weather-header">
-            <button id="back-btn" aria-label="Back to search">&larr; Back</button>
-            <h1 id="location-name"></h1>
-            <div class="weather-toggles">
-                <button id="units-toggle" class="units-toggle">°C</button>
-                <button id="time-toggle" class="units-toggle">24H</button>
-                <button id="lock-toggle" class="units-toggle" title="Lock layout">🔓</button>
-                <button id="settings-toggle" class="units-toggle" title="Settings">⚙️</button>
-                <!-- Settings popover (hidden by default) -->
-                <div id="settings-popover" hidden>
-                    <label><input type="checkbox" id="setting-forecast-colors" data-setting="showForecastColors" checked> Show color backgrounds on 10-day forecast</label>
-                    <label><input type="checkbox" id="setting-support-btn" data-setting="showSupportBtn" checked> Show Annoying Donate Button</label>
-                    <label><input type="checkbox" id="setting-weather-summary" data-setting="showWeatherSummary" checked> Show weather summary</label>
-                    <label><input type="checkbox" id="setting-theme-toggle" data-setting="showThemeToggle" checked> Show Light Mode / Dark Mode button</label>
-                    <button id="settings-revert" class="settings-revert-btn">Restore Default Layout</button>
+            <div class="weather-toolbar">
+                <button id="back-btn" aria-label="Back to search">&larr; Back</button>
+                <div class="weather-toggles">
+                    <button id="units-toggle" class="units-toggle">°C</button>
+                    <button id="time-toggle" class="units-toggle">24H</button>
+                    <button id="lock-toggle" class="units-toggle" title="Lock layout">🔓</button>
+                    <button id="settings-toggle" class="units-toggle" title="Settings">⚙️</button>
+                    <!-- Settings popover (hidden by default) -->
+                    <div id="settings-popover" hidden>
+                        <label><input type="checkbox" id="setting-forecast-colors" data-setting="showForecastColors" checked> Show color backgrounds on 10-day forecast</label>
+                        <label><input type="checkbox" id="setting-support-btn" data-setting="showSupportBtn" checked> Show Annoying Donate Button</label>
+                        <label><input type="checkbox" id="setting-weather-summary" data-setting="showWeatherSummary" checked> Show weather summary</label>
+                        <label><input type="checkbox" id="setting-theme-toggle" data-setting="showThemeToggle" checked> Show Light Mode / Dark Mode button</label>
+                        <button id="settings-revert" class="settings-revert-btn">Restore Default Layout</button>
+                    </div>
                 </div>
             </div>
+            <h1 id="location-name"></h1>
         </header>
         <main id="weather-content">
             <section id="alerts-section" hidden></section>
