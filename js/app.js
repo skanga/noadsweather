@@ -1504,7 +1504,7 @@ function renderDaily(daily, hourly) {
     // Store globally so theme toggle can recompute
     window._forecastAvgTemps = avgTemps;
     const tempRange = Math.max(...avgTemps) - Math.min(...avgTemps);
-    const showTempColors = tempRange >= TEMP_COLOR_THRESHOLD;
+    const showTempColors = tempRange >= TEMP_COLOR_THRESHOLD && getSettingsBool('showForecastColors');
 
     // --- Day column header (inside scroll) ---
     let dayHeaderHtml = '';
