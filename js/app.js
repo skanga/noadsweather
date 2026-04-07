@@ -1912,11 +1912,16 @@ async function loadRadar(lat, lon) {
         const offsetX = 50 - (2 + fracX) / gridSize * 500;
         const offsetY = 50 - (2 + fracY) / gridSize * 500;
 
-        function buildTileGrid(tileSrcFn, extraStyle) {
+        function buildTileGrid(tileSrcFn, extraStyle, defer) {
             let html = `<div style="position:absolute;left:${offsetX}%;top:${offsetY}%;width:${gridSize * 100}%;height:${gridSize * 100}%;display:grid;grid-template-columns:repeat(${gridSize},1fr);${extraStyle || ''}">`;
             for (let dy = -2; dy <= 2; dy++) {
                 for (let dx = -2; dx <= 2; dx++) {
-                    html += `<img src="${tileSrcFn(centerTileX + dx, centerTileY + dy)}" alt="" style="width:100%;height:100%;display:block;" data-retries="0" onerror="if(this.dataset.retries<3){this.dataset.retries++;setTimeout(()=>{this.src=this.src+'&r='+this.dataset.retries},1000*this.dataset.retries)}else{this.style.visibility='hidden'}">`;
+                    const url = tileSrcFn(centerTileX + dx, centerTileY + dy);
+                    if (defer) {
+                        html += `<img data-src="${url}" alt="" style="width:100%;height:100%;display:block;" data-retries="0">`;
+                    } else {
+                        html += `<img src="${url}" alt="" style="width:100%;height:100%;display:block;" data-retries="0" onerror="if(this.dataset.retries<3){this.dataset.retries++;setTimeout(()=>{this.src=this.src+'&r='+this.dataset.retries},1000*this.dataset.retries)}else{this.style.visibility='hidden'}">`;
+                    }
                 }
             }
             return html + '</div>';
@@ -1931,12 +1936,14 @@ async function loadRadar(lat, lon) {
             'opacity:0.7;'
         );
 
-        // Radar layers — one per frame, all hidden except latest
+        // Radar layers — only load the latest frame immediately, lazy-load others
         let radarHtml = '';
         frames.forEach((frame, i) => {
+            const isLatest = i === frames.length - 1;
             radarHtml += buildTileGrid(
                 (tx, ty) => `https://tilecache.rainviewer.com${frame.path}/256/${zoom}/${tx}/${ty}/2/1_0.png`,
-                `opacity:${i === frames.length - 1 ? 1 : 0};transition:opacity 0.3s;`
+                `opacity:${isLatest ? 1 : 0};transition:opacity 0.3s;`,
+                !isLatest // defer loading for non-visible frames
             ).replace('<div ', `<div class="radar-frame" data-frame="${i}" `);
         });
 
@@ -1965,12 +1972,38 @@ async function loadRadar(lat, lon) {
         if (speedIdx < 0 || speedIdx >= speeds.length) speedIdx = 2;
         let paused = false;
 
+        // Load deferred tiles for a frame
+        function loadFrame(frameEl) {
+            frameEl.querySelectorAll('img[data-src]').forEach(img => {
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+                img.dataset.retries = '0';
+                img.onerror = function () {
+                    if (this.dataset.retries < 3) {
+                        this.dataset.retries++;
+                        setTimeout(() => { this.src = this.src + '&r=' + this.dataset.retries; }, 1000 * this.dataset.retries);
+                    } else { this.style.visibility = 'hidden'; }
+                };
+            });
+        }
+
+        // Preload all frames sequentially with a small delay
+        let preloadIdx = 0;
+        function preloadNext() {
+            if (preloadIdx >= allFrameEls.length) return;
+            loadFrame(allFrameEls[preloadIdx]);
+            preloadIdx++;
+            setTimeout(preloadNext, 300);
+        }
+        preloadNext();
+
         function startAnimation() {
             if (radarInterval) clearInterval(radarInterval);
             radarInterval = setInterval(() => {
                 if (paused) return;
                 allFrameEls[currentFrame].style.opacity = '0';
                 currentFrame = (currentFrame + 1) % frames.length;
+                loadFrame(allFrameEls[currentFrame]);
                 allFrameEls[currentFrame].style.opacity = '1';
                 showFrameTime(frames[currentFrame]);
             }, speeds[speedIdx]);
