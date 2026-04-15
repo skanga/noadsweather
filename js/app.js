@@ -371,6 +371,9 @@ function renderHiddenSectionsBar() {
             applySectionPreferences();
         });
     });
+
+    // Respect settings — hide the bar if user turned off section buttons
+    if (typeof applySettings === 'function') applySettings();
 }
 
 // --- Drag-to-Reorder ---------------------------------------------------------
@@ -557,6 +560,9 @@ function renderHiddenChartsBar() {
             renderHiddenChartsBar();
         });
     });
+
+    // Respect settings — hide the bar if user turned off section buttons
+    if (typeof applySettings === 'function') applySettings();
 }
 
 function initChartDrag() {
@@ -2483,6 +2489,13 @@ function applySettings() {
     const nwsLink = document.querySelector('.nws-radar-link');
     if (nwsLink) nwsLink.style.display = getSettingsBool('showNwsLink') ? '' : 'none';
 
+    // "Show section" buttons bars
+    const showSectionBtns = getSettingsBool('showSectionButtons');
+    const sectionsBar = document.getElementById('hidden-sections-bar');
+    if (sectionsBar) sectionsBar.style.display = showSectionBtns ? '' : 'none';
+    const chartsBar = document.getElementById('hidden-charts-bar');
+    if (chartsBar) chartsBar.style.display = showSectionBtns ? '' : 'none';
+
     // Sync checkboxes
     document.querySelectorAll('#settings-popover input[data-setting]').forEach(cb => {
         cb.checked = getSettingsBool(cb.dataset.setting);
@@ -2528,6 +2541,7 @@ document.getElementById('settings-revert').addEventListener('click', () => {
     localStorage.setItem('showTimeBtn', 'true');
     localStorage.setItem('showLockBtn', 'true');
     localStorage.setItem('showNwsLink', 'true');
+    localStorage.setItem('showSectionButtons', 'true');
     localStorage.removeItem('sectionPrefs');
     applySettings();
     if (_lastLat !== null) {
