@@ -61,20 +61,36 @@ functions.http('alerts', async (req, res) => {
         const data = await upstream.json();
         const alerts = data.alerts || [];
 
-        // Dedupe by (event + description) — same event across multiple areas collapses
+        // Filter out expired alerts (end time in the past)
+        const nowSec = Math.floor(Date.now() / 1000);
+        const active = alerts.filter(a => !a.end || a.end >= nowSec);
+
+        // Dedupe by (event + description) — identical duplicates collapse
         const seen = new Set();
         const unique = [];
-        for (const a of alerts) {
+        for (const a of active) {
             const k = `${a.event || ''}|${a.description || ''}`;
             if (seen.has(k)) continue;
             seen.add(k);
             unique.push(a);
         }
 
+        // Keep only the most recent alert per event type (by start time).
+        // Weather agencies issue updated warnings that supersede older ones;
+        // showing only the latest avoids confusing the user with stale revisions.
+        const latestByEvent = new Map();
+        for (const a of unique) {
+            const key = (a.event || '').toLowerCase();
+            const existing = latestByEvent.get(key);
+            if (!existing || (a.start || 0) > (existing.start || 0)) {
+                latestByEvent.set(key, a);
+            }
+        }
+
         // Title-case short event names like "wind" → "Wind"
         const titleCase = s => (s || '').replace(/\b\w/g, c => c.toUpperCase());
 
-        const features = unique.map(a => {
+        const features = Array.from(latestByEvent.values()).map(a => {
             const event = titleCase(a.event);
             return {
                 properties: {
