@@ -14,6 +14,7 @@ const TRANSLATIONS = {
         sun: 'Sun',
         moon: 'Moon',
         weatherAlerts: '⚠️ Weather Alerts',
+        translateAlert: 'Translate',
         searchPlaceholder: 'Enter city or zip code',
         searchButton: 'Search',
         back: '← Back',
@@ -47,6 +48,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Show Lock / Unlock button',
         settingNwsLink: 'Show NWS Radar link',
         settingShowSectionButtons: 'Show "Show section" buttons when sections are hidden',
+        settingTranslateLink: 'Show alert translation link',
 
         // Weather codes (WMO)
         wc0: 'Clear sky',
@@ -204,6 +206,7 @@ const TRANSLATIONS = {
         sun: 'Sol',
         moon: 'Luna',
         weatherAlerts: '⚠️ Alertas meteorológicas',
+        translateAlert: 'Traducir',
         searchPlaceholder: 'Ingresa ciudad o código postal',
         searchButton: 'Buscar',
         back: '← Volver',
@@ -237,6 +240,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Mostrar botón Bloquear / Desbloquear',
         settingNwsLink: 'Mostrar enlace al radar NWS',
         settingShowSectionButtons: 'Mostrar botones "Mostrar sección" cuando las secciones están ocultas',
+        settingTranslateLink: 'Mostrar enlace de traducción de alertas',
 
         // Weather codes
         wc0: 'Cielo despejado',
@@ -394,6 +398,7 @@ const TRANSLATIONS = {
         sun: 'Soleil',
         moon: 'Lune',
         weatherAlerts: '⚠️ Alertes météo',
+        translateAlert: 'Traduire',
         searchPlaceholder: 'Entrez ville ou code postal',
         searchButton: 'Rechercher',
         back: '← Retour',
@@ -427,6 +432,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Afficher le bouton Verrouiller / Déverrouiller',
         settingNwsLink: 'Afficher le lien du radar NWS',
         settingShowSectionButtons: 'Afficher les boutons "Afficher la section" lorsque les sections sont masquées',
+        settingTranslateLink: 'Afficher le lien de traduction des alertes',
 
         // Weather codes
         wc0: 'Ciel dégagé',
@@ -584,6 +590,7 @@ const TRANSLATIONS = {
         sun: 'Sonne',
         moon: 'Mond',
         weatherAlerts: '⚠️ Wetterwarnungen',
+        translateAlert: 'Übersetzen',
         searchPlaceholder: 'Stadt oder Postleitzahl eingeben',
         searchButton: 'Suchen',
         back: '← Zurück',
@@ -617,6 +624,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Sperren/Entsperren-Schaltfläche anzeigen',
         settingNwsLink: 'NWS-Radar-Link anzeigen',
         settingShowSectionButtons: '"Bereich anzeigen"-Schaltflächen anzeigen, wenn Bereiche ausgeblendet sind',
+        settingTranslateLink: 'Übersetzungslink für Warnungen anzeigen',
 
         // Weather codes
         wc0: 'Klarer Himmel',
@@ -774,6 +782,7 @@ const TRANSLATIONS = {
         sun: 'Sole',
         moon: 'Luna',
         weatherAlerts: '⚠️ Allerte meteo',
+        translateAlert: 'Traduci',
         searchPlaceholder: 'Inserisci città o CAP',
         searchButton: 'Cerca',
         back: '← Indietro',
@@ -807,6 +816,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Mostra pulsante Blocca / Sblocca',
         settingNwsLink: 'Mostra link radar NWS',
         settingShowSectionButtons: 'Mostra i pulsanti "Mostra sezione" quando le sezioni sono nascoste',
+        settingTranslateLink: 'Mostra link di traduzione delle allerte',
 
         // Weather codes
         wc0: 'Cielo sereno',
@@ -964,6 +974,7 @@ const TRANSLATIONS = {
         sun: 'Sol',
         moon: 'Lua',
         weatherAlerts: '⚠️ Alertas meteorológicos',
+        translateAlert: 'Traduzir',
         searchPlaceholder: 'Digite cidade ou CEP',
         searchButton: 'Buscar',
         back: '← Voltar',
@@ -997,6 +1008,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Mostrar botão Bloquear / Desbloquear',
         settingNwsLink: 'Mostrar link do radar NWS',
         settingShowSectionButtons: 'Mostrar botões "Mostrar seção" quando as seções estiverem ocultas',
+        settingTranslateLink: 'Mostrar link de tradução de alertas',
 
         // Weather codes
         wc0: 'Céu limpo',
@@ -1154,6 +1166,7 @@ const TRANSLATIONS = {
         sun: 'Zon',
         moon: 'Maan',
         weatherAlerts: '⚠️ Weerwaarschuwingen',
+        translateAlert: 'Vertalen',
         searchPlaceholder: 'Voer stad of postcode in',
         searchButton: 'Zoeken',
         back: '← Terug',
@@ -1187,6 +1200,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Vergrendel- / Ontgrendelknop tonen',
         settingNwsLink: 'NWS-radarlink tonen',
         settingShowSectionButtons: '"Sectie tonen"-knoppen tonen wanneer secties verborgen zijn',
+        settingTranslateLink: 'Vertaallink voor waarschuwingen tonen',
 
         // Weather codes
         wc0: 'Heldere hemel',
@@ -1344,6 +1358,7 @@ const TRANSLATIONS = {
         sun: 'Słońce',
         moon: 'Księżyc',
         weatherAlerts: '⚠️ Ostrzeżenia pogodowe',
+        translateAlert: 'Przetłumacz',
         searchPlaceholder: 'Wpisz miasto lub kod pocztowy',
         searchButton: 'Szukaj',
         back: '← Wstecz',
@@ -1377,6 +1392,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Pokaż przycisk Zablokuj / Odblokuj',
         settingNwsLink: 'Pokaż link do radaru NWS',
         settingShowSectionButtons: 'Pokaż przyciski "Pokaż sekcję", gdy sekcje są ukryte',
+        settingTranslateLink: 'Pokaż link do tłumaczenia ostrzeżeń',
 
         // Weather codes
         wc0: 'Bezchmurnie',
@@ -1534,6 +1550,7 @@ const TRANSLATIONS = {
         sun: 'Sol',
         moon: 'Måne',
         weatherAlerts: '⚠️ Vädervarningar',
+        translateAlert: 'Översätt',
         searchPlaceholder: 'Ange stad eller postnummer',
         searchButton: 'Sök',
         back: '← Tillbaka',
@@ -1567,6 +1584,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Visa knappen Lås / Lås upp',
         settingNwsLink: 'Visa länk till NWS-radar',
         settingShowSectionButtons: 'Visa "Visa sektion"-knappar när sektioner är dolda',
+        settingTranslateLink: 'Visa översättningslänk för varningar',
 
         // Weather codes
         wc0: 'Klar himmel',
@@ -1724,6 +1742,7 @@ const TRANSLATIONS = {
         sun: 'Солнце',
         moon: 'Луна',
         weatherAlerts: '⚠️ Погодные предупреждения',
+        translateAlert: 'Перевести',
         searchPlaceholder: 'Введите город или почтовый индекс',
         searchButton: 'Поиск',
         back: '← Назад',
@@ -1757,6 +1776,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'Показывать кнопку Заблокировать / Разблокировать',
         settingNwsLink: 'Показывать ссылку на радар NWS',
         settingShowSectionButtons: 'Показывать кнопки "Показать раздел", когда разделы скрыты',
+        settingTranslateLink: 'Показывать ссылку для перевода предупреждений',
 
         // Weather codes
         wc0: 'Ясное небо',
@@ -1914,6 +1934,7 @@ const TRANSLATIONS = {
         sun: '日の出・日の入',
         moon: '月',
         weatherAlerts: '⚠️ 気象警報',
+        translateAlert: '翻訳',
         searchPlaceholder: '都市名または郵便番号を入力',
         searchButton: '検索',
         back: '← 戻る',
@@ -1947,6 +1968,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'ロック / ロック解除ボタンを表示',
         settingNwsLink: 'NWSレーダーリンクを表示',
         settingShowSectionButtons: 'セクションが非表示のときに「セクションを表示」ボタンを表示',
+        settingTranslateLink: '警報の翻訳リンクを表示',
 
         // Weather codes
         wc0: '快晴',
@@ -2104,6 +2126,7 @@ const TRANSLATIONS = {
         sun: '日出日落',
         moon: '月相',
         weatherAlerts: '⚠️ 天气警报',
+        translateAlert: '翻译',
         searchPlaceholder: '输入城市或邮政编码',
         searchButton: '搜索',
         back: '← 返回',
@@ -2137,6 +2160,7 @@ const TRANSLATIONS = {
         settingLockBtn: '显示锁定 / 解锁按钮',
         settingNwsLink: '显示NWS雷达链接',
         settingShowSectionButtons: '当部分隐藏时显示"显示部分"按钮',
+        settingTranslateLink: '显示警报翻译链接',
 
         // Weather codes
         wc0: '晴',
@@ -2294,6 +2318,7 @@ const TRANSLATIONS = {
         sun: '일출/일몰',
         moon: '달',
         weatherAlerts: '⚠️ 기상 경보',
+        translateAlert: '번역',
         searchPlaceholder: '도시 또는 우편번호 입력',
         searchButton: '검색',
         back: '← 뒤로',
@@ -2327,6 +2352,7 @@ const TRANSLATIONS = {
         settingLockBtn: '잠금 / 잠금 해제 버튼 표시',
         settingNwsLink: 'NWS 레이더 링크 표시',
         settingShowSectionButtons: '섹션이 숨겨져 있을 때 "섹션 표시" 버튼 표시',
+        settingTranslateLink: '경보 번역 링크 표시',
 
         // Weather codes
         wc0: '맑음',
@@ -2484,6 +2510,7 @@ const TRANSLATIONS = {
         sun: 'الشمس',
         moon: 'القمر',
         weatherAlerts: '⚠️ تنبيهات الطقس',
+        translateAlert: 'ترجمة',
         searchPlaceholder: 'أدخل المدينة أو الرمز البريدي',
         searchButton: 'بحث',
         back: '← رجوع',
@@ -2517,6 +2544,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'عرض زر القفل / إلغاء القفل',
         settingNwsLink: 'عرض رابط رادار NWS',
         settingShowSectionButtons: 'عرض أزرار "إظهار القسم" عندما تكون الأقسام مخفية',
+        settingTranslateLink: 'عرض رابط ترجمة التنبيهات',
 
         // Weather codes
         wc0: 'سماء صافية',
@@ -2674,6 +2702,7 @@ const TRANSLATIONS = {
         sun: 'सूर्य',
         moon: 'चंद्रमा',
         weatherAlerts: '⚠️ मौसम चेतावनी',
+        translateAlert: 'अनुवाद करें',
         searchPlaceholder: 'शहर या पिन कोड दर्ज करें',
         searchButton: 'खोजें',
         back: '← वापस',
@@ -2707,6 +2736,7 @@ const TRANSLATIONS = {
         settingLockBtn: 'लॉक / अनलॉक बटन दिखाएं',
         settingNwsLink: 'NWS रडार लिंक दिखाएं',
         settingShowSectionButtons: 'जब अनुभाग छिपे हों तो "अनुभाग दिखाएं" बटन दिखाएं',
+        settingTranslateLink: 'चेतावनी अनुवाद लिंक दिखाएं',
 
         // Weather codes
         wc0: 'साफ आसमान',

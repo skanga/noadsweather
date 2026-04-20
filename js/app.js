@@ -1895,6 +1895,14 @@ function escapeHtml(s) {
     })[c]);
 }
 
+function buildTranslateLink(text) {
+    if (!getSettingsBool('showTranslateLink')) return '';
+    if (!text) return '';
+    const uiLang = getCurrentLang();
+    const url = `https://translate.google.com/?sl=auto&tl=${uiLang}&text=${encodeURIComponent(text)}&op=translate`;
+    return ` <a href="${url}" target="_blank" rel="noopener" class="alert-translate-link">${t('translateAlert')}</a>`;
+}
+
 function renderAlerts(alerts) {
     const section = document.getElementById('alerts-section');
     if (!alerts || alerts.length === 0) {
@@ -1903,12 +1911,15 @@ function renderAlerts(alerts) {
     }
     section.hidden = false;
     const DESC_PREVIEW_CHARS = 300;
-    let html = '<h2>⚠️ Weather Alerts</h2>';
+    let html = `<h2>${t('weatherAlerts')}</h2>`;
     for (const alert of alerts) {
         const p = alert.properties;
         const event = escapeHtml(p.event);
         const headline = escapeHtml(p.headline || '');
         const descRaw = (p.description || '').trim();
+        // Full text to translate = event + headline + description
+        const fullText = [p.event, p.headline, descRaw].filter(Boolean).join('\n\n');
+        const translateLink = buildTranslateLink(fullText);
         let descHtml = '';
         if (descRaw) {
             const descEsc = escapeHtml(descRaw).replace(/\n/g, '<br>');
@@ -1928,7 +1939,7 @@ function renderAlerts(alerts) {
         }
         html += `
             <div style="margin-bottom:0.9rem;">
-                <strong>${event}</strong>
+                <strong>${event}</strong>${translateLink}
                 <div style="font-size:0.85rem;margin-top:0.25rem;">${headline}</div>
                 ${descHtml}
             </div>
@@ -2638,6 +2649,7 @@ document.getElementById('settings-revert').addEventListener('click', () => {
     localStorage.setItem('showLockBtn', 'true');
     localStorage.setItem('showNwsLink', 'true');
     localStorage.setItem('showSectionButtons', 'true');
+    localStorage.setItem('showTranslateLink', 'true');
     localStorage.removeItem('sectionPrefs');
     applySettings();
     if (_lastLat !== null) {

@@ -440,6 +440,19 @@ body.layout-locked .chart-min-btn {
     flex-shrink: 0;
 }
 
+.alert-translate-link {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    margin-left: 0.4rem;
+    white-space: nowrap;
+}
+.alert-translate-link:hover {
+    color: var(--accent);
+}
+
 .settings-revert-btn {
     display: block;
     width: 100%;
