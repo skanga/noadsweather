@@ -60,18 +60,35 @@ functions.http('alerts', async (req, res) => {
 
         const data = await upstream.json();
         const alerts = data.alerts || [];
-        const features = alerts.map(a => ({
-            properties: {
-                event: a.event,
-                headline: a.sender_name ? `${a.event} — ${a.sender_name}` : a.event,
-                description: a.description,
-                severity: 'Severe',
-                senderName: a.sender_name,
-                start: a.start,
-                end: a.end,
-                tags: a.tags || []
-            }
-        }));
+
+        // Dedupe by (event + description) — same event across multiple areas collapses
+        const seen = new Set();
+        const unique = [];
+        for (const a of alerts) {
+            const k = `${a.event || ''}|${a.description || ''}`;
+            if (seen.has(k)) continue;
+            seen.add(k);
+            unique.push(a);
+        }
+
+        // Title-case short event names like "wind" → "Wind"
+        const titleCase = s => (s || '').replace(/\b\w/g, c => c.toUpperCase());
+
+        const features = unique.map(a => {
+            const event = titleCase(a.event);
+            return {
+                properties: {
+                    event,
+                    headline: a.sender_name ? `${event} — ${a.sender_name}` : event,
+                    description: a.description,
+                    severity: 'Severe',
+                    senderName: a.sender_name,
+                    start: a.start,
+                    end: a.end,
+                    tags: a.tags || []
+                }
+            };
+        });
 
         const result = { features };
         cacheSet(key, result);

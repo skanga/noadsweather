@@ -1868,6 +1868,12 @@ function drawAllCharts(hourly, hours, r) {
     }
 }
 
+function escapeHtml(s) {
+    return String(s || '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[c]);
+}
+
 function renderAlerts(alerts) {
     const section = document.getElementById('alerts-section');
     if (!alerts || alerts.length === 0) {
@@ -1875,17 +1881,49 @@ function renderAlerts(alerts) {
         return;
     }
     section.hidden = false;
+    const DESC_PREVIEW_CHARS = 300;
     let html = '<h2>⚠️ Weather Alerts</h2>';
     for (const alert of alerts) {
         const p = alert.properties;
+        const event = escapeHtml(p.event);
+        const headline = escapeHtml(p.headline || '');
+        const descRaw = (p.description || '').trim();
+        let descHtml = '';
+        if (descRaw) {
+            const descEsc = escapeHtml(descRaw).replace(/\n/g, '<br>');
+            if (descRaw.length > DESC_PREVIEW_CHARS) {
+                const previewEsc = escapeHtml(descRaw.slice(0, DESC_PREVIEW_CHARS).trimEnd() + '…').replace(/\n/g, '<br>');
+                descHtml = `
+                    <details class="alert-desc" style="font-size:0.8rem;margin-top:0.4rem;">
+                        <summary style="cursor:pointer;list-style:none;">
+                            <span class="alert-desc-preview">${previewEsc}</span>
+                            <span class="alert-desc-more" style="text-decoration:underline;"> Show more</span>
+                        </summary>
+                        <div style="margin-top:0.4rem;white-space:pre-wrap;">${descEsc}</div>
+                    </details>`;
+            } else {
+                descHtml = `<div class="alert-desc" style="font-size:0.8rem;margin-top:0.4rem;white-space:pre-wrap;">${descEsc}</div>`;
+            }
+        }
         html += `
-            <div style="margin-bottom:0.75rem;">
-                <strong>${p.event}</strong>
-                <div style="font-size:0.85rem;margin-top:0.25rem;">${p.headline || ''}</div>
+            <div style="margin-bottom:0.9rem;">
+                <strong>${event}</strong>
+                <div style="font-size:0.85rem;margin-top:0.25rem;">${headline}</div>
+                ${descHtml}
             </div>
         `;
     }
     section.innerHTML = html;
+
+    // Hide preview when details is opened (so we don't show both)
+    section.querySelectorAll('details.alert-desc').forEach(d => {
+        d.addEventListener('toggle', () => {
+            const preview = d.querySelector('.alert-desc-preview');
+            const more = d.querySelector('.alert-desc-more');
+            if (preview) preview.style.display = d.open ? 'none' : '';
+            if (more) more.textContent = d.open ? ' Show less' : ' Show more';
+        });
+    });
 }
 
 let radarInterval = null;
