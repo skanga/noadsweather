@@ -21,7 +21,12 @@ function saveUnitsPref() {
 }
 
 function loadUnitsPref() {
-    return JSON.parse(localStorage.getItem('unitsPref') || 'null');
+    try {
+        return JSON.parse(localStorage.getItem('unitsPref') || 'null');
+    } catch {
+        localStorage.removeItem('unitsPref');
+        return null;
+    }
 }
 
 function applyUnitsFromTemp(temp) {
@@ -117,7 +122,18 @@ function sectionName(id) {
 // Sections that always span 2 columns
 
 function loadSectionPrefs() {
-    const stored = JSON.parse(localStorage.getItem('sectionPrefs') || 'null');
+    const VALID_SECTION_IDS = new Set(DEFAULT_SECTION_ORDER);
+    const VALID_CHART_IDS = new Set(DEFAULT_CHART_ORDER);
+    const onlyValid = (arr, set) => Array.isArray(arr) ? arr.filter(id => typeof id === 'string' && set.has(id)) : [];
+
+    let stored = null;
+    try {
+        stored = JSON.parse(localStorage.getItem('sectionPrefs') || 'null');
+    } catch {
+        // Corrupt storage — reset
+        localStorage.removeItem('sectionPrefs');
+    }
+
     // Validate — if missing layoutList, reset
     if (stored && !stored.layoutList) {
         localStorage.removeItem('sectionPrefs');
@@ -130,7 +146,11 @@ function loadSectionPrefs() {
         chartOrder: [...DEFAULT_CHART_ORDER],
         hiddenCharts: [],
     };
-    if (!prefs.hiddenCharts) prefs.hiddenCharts = [];
+    // Sanitize all id fields against allowlists — defends against tampered storage
+    prefs.hidden = onlyValid(prefs.hidden, VALID_SECTION_IDS);
+    prefs.minimized = onlyValid(prefs.minimized, VALID_SECTION_IDS);
+    prefs.chartOrder = onlyValid(prefs.chartOrder, VALID_CHART_IDS);
+    prefs.hiddenCharts = onlyValid(prefs.hiddenCharts || [], VALID_CHART_IDS);
     if (!prefs.layoutList) prefs.layoutList = JSON.parse(JSON.stringify(DEFAULT_LAYOUT_LIST));
     return prefs;
 }
@@ -1443,13 +1463,22 @@ function renderPollen(airQuality, lat, lon) {
         const cacheKey = `pollen_${lat.toFixed(2)}_${lon.toFixed(2)}_${new Date().toISOString().slice(0, 10)}`;
         const cached = localStorage.getItem(cacheKey);
 
+        let cachedData = null;
         if (cached) {
+            try {
+                cachedData = JSON.parse(cached);
+            } catch {
+                // Corrupted cache entry — drop it
+                localStorage.removeItem(cacheKey);
+            }
+        }
+        if (cachedData) {
             // Auto-show cached data
             section.innerHTML = `
                 <h2>${t('pollen')} <span style="text-transform:none;font-weight:400;font-size:0.85rem;color:var(--text-muted);">(${new Date().toLocaleDateString(getCurrentLang(), { month: 'long', day: 'numeric' })})</span></h2>
                 <div id="pollen-content"></div>
             `;
-            displayPollenData(JSON.parse(cached));
+            displayPollenData(cachedData);
         } else {
             section.innerHTML = `
                 <h2>${t('pollen')}</h2>
@@ -1981,9 +2010,11 @@ function renderAlerts(alerts) {
 }
 
 let radarInterval = null;
+let radarPreloadTimer = null;
 
 function renderRadar(lat, lon) {
     if (radarInterval) { clearInterval(radarInterval); radarInterval = null; }
+    if (radarPreloadTimer) { clearTimeout(radarPreloadTimer); radarPreloadTimer = null; }
 
     const section = document.getElementById('radar-section');
     // Check if location is within NWS radar coverage (US territories)
@@ -2027,7 +2058,8 @@ function renderRadar(lat, lon) {
 
     document.getElementById('radar-refresh').addEventListener('click', () => {
         if (radarInterval) { clearInterval(radarInterval); radarInterval = null; }
-        document.getElementById('radar-container').innerHTML = '<div class="loading" style="color:#9ca3af;">Refreshing radar...</div>';
+        if (radarPreloadTimer) { clearTimeout(radarPreloadTimer); radarPreloadTimer = null; }
+        document.getElementById('radar-container').innerHTML = `<div class="loading" style="color:#9ca3af;">${t('refreshingRadar')}</div>`;
         document.getElementById('radar-time').textContent = '';
         loadRadar(lat, lon);
     });
@@ -2087,7 +2119,8 @@ async function loadRadar(lat, lon) {
                             const tries = parseInt(this.dataset.retries || '0', 10);
                             if (tries < 3) {
                                 this.dataset.retries = String(tries + 1);
-                                setTimeout(() => { this.src = url + '&r=' + (tries + 1); }, 1000 * (tries + 1));
+                                const sep = url.includes('?') ? '&' : '?';
+                                setTimeout(() => { this.src = url + sep + 'r=' + (tries + 1); }, 1000 * (tries + 1));
                             } else {
                                 this.style.visibility = 'hidden';
                             }
@@ -2136,7 +2169,8 @@ async function loadRadar(lat, lon) {
                 const tries = parseInt(this.dataset.retries || '0', 10);
                 if (tries < 3) {
                     this.dataset.retries = String(tries + 1);
-                    setTimeout(() => { this.src = original + '&r=' + (tries + 1); }, 1000 * (tries + 1));
+                    const sep = original.includes('?') ? '&' : '?';
+                    setTimeout(() => { this.src = original + sep + 'r=' + (tries + 1); }, 1000 * (tries + 1));
                 } else {
                     this.style.visibility = 'hidden';
                 }
@@ -2163,25 +2197,30 @@ async function loadRadar(lat, lon) {
         // Load deferred tiles for a frame
         function loadFrame(frameEl) {
             frameEl.querySelectorAll('img[data-src]').forEach(img => {
-                img.src = img.dataset.src;
+                const src = img.dataset.src;
+                img.src = src;
                 img.removeAttribute('data-src');
                 img.dataset.retries = '0';
                 img.onerror = function () {
-                    if (this.dataset.retries < 3) {
-                        this.dataset.retries++;
-                        setTimeout(() => { this.src = this.src + '&r=' + this.dataset.retries; }, 1000 * this.dataset.retries);
+                    const tries = parseInt(this.dataset.retries || '0', 10);
+                    if (tries < 3) {
+                        this.dataset.retries = String(tries + 1);
+                        const sep = src.includes('?') ? '&' : '?';
+                        setTimeout(() => { this.src = src + sep + 'r=' + (tries + 1); }, 1000 * (tries + 1));
                     } else { this.style.visibility = 'hidden'; }
                 };
             });
         }
 
-        // Preload all frames sequentially with a small delay
+        // Preload all frames sequentially with a small delay.
+        // Track the timer so we can cancel on re-render (avoids leaking
+        // detached image loads across location/theme changes).
         let preloadIdx = 0;
         function preloadNext() {
             if (preloadIdx >= allFrameEls.length) return;
             loadFrame(allFrameEls[preloadIdx]);
             preloadIdx++;
-            setTimeout(preloadNext, 300);
+            radarPreloadTimer = setTimeout(preloadNext, 300);
         }
         preloadNext();
 
