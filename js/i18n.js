@@ -36,6 +36,14 @@ const TRANSLATIONS = {
         uvIndex: 'UV Index',
         nwsRadarLink: 'NWS radar ↗',
         language: 'Language',
+
+        // Style names
+        style: 'Style',
+        styleDefault: 'Default',
+        styleEditorial: 'Editorial',
+        styleBulletin: 'Bulletin',
+        styleQuiet: 'Quiet',
+
         machineTranslationNotice: 'UI translations are machine-generated and may not be perfect.',
 
         // Settings labels
@@ -228,6 +236,14 @@ const TRANSLATIONS = {
         uvIndex: 'Índice UV',
         nwsRadarLink: 'Radar NWS ↗',
         language: 'Idioma',
+
+        // Style names
+        style: 'Estilo',
+        styleDefault: 'Predeterminado',
+        styleEditorial: 'Editorial',
+        styleBulletin: 'Boletín',
+        styleQuiet: 'Tranquilo',
+
         machineTranslationNotice: 'Las traducciones de la interfaz son automáticas y pueden no ser perfectas.',
 
         // Settings labels
@@ -420,6 +436,14 @@ const TRANSLATIONS = {
         uvIndex: 'Indice UV',
         nwsRadarLink: 'Radar NWS ↗',
         language: 'Langue',
+
+        // Style names
+        style: 'Style',
+        styleDefault: 'Par défaut',
+        styleEditorial: 'Éditorial',
+        styleBulletin: 'Bulletin',
+        styleQuiet: 'Calme',
+
         machineTranslationNotice: 'Les traductions de l\'interface sont générées automatiquement et peuvent ne pas être parfaites.',
 
         // Settings labels
@@ -612,6 +636,14 @@ const TRANSLATIONS = {
         uvIndex: 'UV-Index',
         nwsRadarLink: 'NWS-Radar ↗',
         language: 'Sprache',
+
+        // Style names
+        style: 'Stil',
+        styleDefault: 'Standard',
+        styleEditorial: 'Editorial',
+        styleBulletin: 'Bulletin',
+        styleQuiet: 'Ruhig',
+
         machineTranslationNotice: 'Die Übersetzungen der Benutzeroberfläche sind maschinell erstellt und möglicherweise nicht perfekt.',
 
         // Settings labels
@@ -804,6 +836,14 @@ const TRANSLATIONS = {
         uvIndex: 'Indice UV',
         nwsRadarLink: 'Radar NWS ↗',
         language: 'Lingua',
+
+        // Style names
+        style: 'Stile',
+        styleDefault: 'Predefinito',
+        styleEditorial: 'Editoriale',
+        styleBulletin: 'Bollettino',
+        styleQuiet: 'Sobrio',
+
         machineTranslationNotice: 'Le traduzioni dell\'interfaccia sono generate automaticamente e potrebbero non essere perfette.',
 
         // Settings labels
@@ -996,6 +1036,14 @@ const TRANSLATIONS = {
         uvIndex: 'Índice UV',
         nwsRadarLink: 'Radar NWS ↗',
         language: 'Idioma',
+
+        // Style names
+        style: 'Estilo',
+        styleDefault: 'Padrão',
+        styleEditorial: 'Editorial',
+        styleBulletin: 'Boletim',
+        styleQuiet: 'Tranquilo',
+
         machineTranslationNotice: 'As traduções da interface são geradas automaticamente e podem não estar perfeitas.',
 
         // Settings labels
@@ -1188,6 +1236,14 @@ const TRANSLATIONS = {
         uvIndex: 'UV-index',
         nwsRadarLink: 'NWS-radar ↗',
         language: 'Taal',
+
+        // Style names
+        style: 'Stijl',
+        styleDefault: 'Standaard',
+        styleEditorial: 'Editorial',
+        styleBulletin: 'Bulletin',
+        styleQuiet: 'Rustig',
+
         machineTranslationNotice: 'UI-vertalingen zijn automatisch gegenereerd en zijn mogelijk niet perfect.',
 
         // Settings labels
@@ -1380,6 +1436,14 @@ const TRANSLATIONS = {
         uvIndex: 'Indeks UV',
         nwsRadarLink: 'Radar NWS ↗',
         language: 'Język',
+
+        // Style names
+        style: 'Styl',
+        styleDefault: 'Domyślny',
+        styleEditorial: 'Edytorski',
+        styleBulletin: 'Biuletyn',
+        styleQuiet: 'Spokojny',
+
         machineTranslationNotice: 'Tłumaczenia interfejsu są generowane maszynowo i mogą nie być idealne.',
 
         // Settings labels
@@ -1572,6 +1636,14 @@ const TRANSLATIONS = {
         uvIndex: 'UV-index',
         nwsRadarLink: 'NWS-radar ↗',
         language: 'Språk',
+
+        // Style names
+        style: 'Stil',
+        styleDefault: 'Standard',
+        styleEditorial: 'Editorial',
+        styleBulletin: 'Bulletin',
+        styleQuiet: 'Lugn',
+
         machineTranslationNotice: 'Översättningar av gränssnittet är maskingenererade och kanske inte är perfekta.',
 
         // Settings labels
@@ -1764,6 +1836,14 @@ const TRANSLATIONS = {
         uvIndex: 'УФ-индекс',
         nwsRadarLink: 'Радар NWS ↗',
         language: 'Язык',
+
+        // Style names
+        style: 'Стиль',
+        styleDefault: 'По умолчанию',
+        styleEditorial: 'Журнальный',
+        styleBulletin: 'Бюллетень',
+        styleQuiet: 'Тихий',
+
         machineTranslationNotice: 'Переводы интерфейса сгенерированы автоматически и могут быть неидеальными.',
 
         // Settings labels
@@ -1956,6 +2036,14 @@ const TRANSLATIONS = {
         uvIndex: '紫外線指数',
         nwsRadarLink: 'NWSレーダー ↗',
         language: '言語',
+
+        // Style names
+        style: 'スタイル',
+        styleDefault: 'デフォルト',
+        styleEditorial: 'エディトリアル',
+        styleBulletin: '速報',
+        styleQuiet: '静か',
+
         machineTranslationNotice: 'UI翻訳は機械生成のため、完璧ではない場合があります。',
 
         // Settings labels
@@ -2148,6 +2236,14 @@ const TRANSLATIONS = {
         uvIndex: '紫外线指数',
         nwsRadarLink: 'NWS雷达 ↗',
         language: '语言',
+
+        // Style names
+        style: '样式',
+        styleDefault: '默认',
+        styleEditorial: '杂志风',
+        styleBulletin: '公告',
+        styleQuiet: '静谧',
+
         machineTranslationNotice: '界面翻译由机器生成，可能不完美。',
 
         // Settings labels
@@ -2340,6 +2436,14 @@ const TRANSLATIONS = {
         uvIndex: '자외선 지수',
         nwsRadarLink: 'NWS 레이더 ↗',
         language: '언어',
+
+        // Style names
+        style: '스타일',
+        styleDefault: '기본',
+        styleEditorial: '에디토리얼',
+        styleBulletin: '회보',
+        styleQuiet: '정적',
+
         machineTranslationNotice: 'UI 번역은 기계 번역으로 생성되어 완벽하지 않을 수 있습니다.',
 
         // Settings labels
@@ -2532,6 +2636,14 @@ const TRANSLATIONS = {
         uvIndex: 'مؤشر الأشعة فوق البنفسجية',
         nwsRadarLink: 'رادار NWS ↗',
         language: 'اللغة',
+
+        // Style names
+        style: 'النمط',
+        styleDefault: 'افتراضي',
+        styleEditorial: 'تحريري',
+        styleBulletin: 'نشرة',
+        styleQuiet: 'هادئ',
+
         machineTranslationNotice: 'ترجمات واجهة المستخدم مُولَّدة آليًا وقد لا تكون مثالية.',
 
         // Settings labels
@@ -2724,6 +2836,14 @@ const TRANSLATIONS = {
         uvIndex: 'यूवी इंडेक्स',
         nwsRadarLink: 'NWS रडार ↗',
         language: 'भाषा',
+
+        // Style names
+        style: 'शैली',
+        styleDefault: 'डिफ़ॉल्ट',
+        styleEditorial: 'संपादकीय',
+        styleBulletin: 'बुलेटिन',
+        styleQuiet: 'शांत',
+
         machineTranslationNotice: 'UI अनुवाद मशीन द्वारा उत्पन्न हैं और पूर्ण नहीं हो सकते हैं।',
 
         // Settings labels

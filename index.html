@@ -10,6 +10,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#111827">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
 <body>
     <!-- Home View -->
@@ -93,6 +95,15 @@
     <!-- Settings popover (floating, hidden by default) -->
     <div id="settings-popover" hidden>
         <button id="language-btn" class="settings-language-btn" type="button">Language</button>
+        <label class="settings-style-row">
+            <span data-i18n="style">Style</span>
+            <select id="setting-style" class="settings-style-select">
+                <option value="default" data-i18n="styleDefault">Default</option>
+                <option value="editorial" data-i18n="styleEditorial">Editorial</option>
+                <option value="bulletin" data-i18n="styleBulletin">Bulletin</option>
+                <option value="quiet" data-i18n="styleQuiet">Quiet</option>
+            </select>
+        </label>
         <label><input type="checkbox" id="setting-forecast-colors" data-setting="showForecastColors" checked> <span data-i18n="settingForecastColors">Show color backgrounds on 10-day forecast</span></label>
         <label><input type="checkbox" id="setting-support-btn" data-setting="showSupportBtn" checked> <span data-i18n="settingSupportBtn">Show Annoying Support Button</span></label>
         <label><input type="checkbox" id="setting-weather-summary" data-setting="showWeatherSummary" checked> <span data-i18n="settingWeatherSummary">Show weather summary</span></label>

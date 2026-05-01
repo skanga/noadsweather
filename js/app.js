@@ -682,6 +682,42 @@ const searchError = document.getElementById('search-error');
 const locationName = document.getElementById('location-name');
 const backBtn = document.getElementById('back-btn');
 
+// --- Style (visual variant — orthogonal to light/dark theme) -----------------
+
+const SUPPORTED_STYLES = ['default', 'editorial', 'bulletin', 'quiet'];
+
+const STYLE_FONT_LINKS = {
+    editorial: 'https://fonts.googleapis.com/css2?family=Eczar:wght@500;600;700&family=Faustina:ital,wght@0,400;0,500;0,600;1,400&display=swap',
+    bulletin: 'https://fonts.googleapis.com/css2?family=Cutive&family=Cutive+Mono&display=swap',
+    quiet: 'https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap'
+};
+
+function getCurrentStyle() {
+    const stored = localStorage.getItem('style');
+    return SUPPORTED_STYLES.includes(stored) ? stored : 'default';
+}
+
+function applyStyle(style) {
+    if (!SUPPORTED_STYLES.includes(style)) style = 'default';
+    if (style === 'default') {
+        document.documentElement.removeAttribute('data-style');
+    } else {
+        document.documentElement.setAttribute('data-style', style);
+    }
+    // Lazy-load web fonts only when needed
+    const fontUrl = STYLE_FONT_LINKS[style];
+    if (fontUrl && !document.getElementById(`style-font-${style}`)) {
+        const link = document.createElement('link');
+        link.id = `style-font-${style}`;
+        link.rel = 'stylesheet';
+        link.href = fontUrl;
+        document.head.appendChild(link);
+    }
+    // Sync the dropdown
+    const sel = document.getElementById('setting-style');
+    if (sel) sel.value = style;
+}
+
 // --- i18n --------------------------------------------------------------------
 
 function applyTranslations() {
@@ -2716,8 +2752,21 @@ window.addEventListener('popstate', () => {
     }
 });
 
-// Apply translations before any rendering
+// Apply visual style and translations before any rendering
+applyStyle(getCurrentStyle());
 applyTranslations();
+
+// Wire up the Style dropdown in the settings popover
+(function initStyleSelector() {
+    const sel = document.getElementById('setting-style');
+    if (!sel) return;
+    sel.value = getCurrentStyle();
+    sel.addEventListener('change', () => {
+        const newStyle = sel.value;
+        localStorage.setItem('style', newStyle);
+        applyStyle(newStyle);
+    });
+})();
 
 // Load from URL on page load
 loadFromURL();
