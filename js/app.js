@@ -686,12 +686,6 @@ const backBtn = document.getElementById('back-btn');
 
 const SUPPORTED_STYLES = ['default', 'editorial', 'bulletin', 'quiet'];
 
-const STYLE_FONT_LINKS = {
-    editorial: 'https://fonts.googleapis.com/css2?family=Eczar:wght@500;600;700&family=Faustina:ital,wght@0,400;0,500;0,600;1,400&display=swap',
-    bulletin: 'https://fonts.googleapis.com/css2?family=Cutive&family=Cutive+Mono&display=swap',
-    quiet: 'https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap'
-};
-
 function getCurrentStyle() {
     const stored = localStorage.getItem('style');
     return SUPPORTED_STYLES.includes(stored) ? stored : 'default';
@@ -704,15 +698,10 @@ function applyStyle(style) {
     } else {
         document.documentElement.setAttribute('data-style', style);
     }
-    // Lazy-load web fonts only when needed
-    const fontUrl = STYLE_FONT_LINKS[style];
-    if (fontUrl && !document.getElementById(`style-font-${style}`)) {
-        const link = document.createElement('link');
-        link.id = `style-font-${style}`;
-        link.rel = 'stylesheet';
-        link.href = fontUrl;
-        document.head.appendChild(link);
-    }
+    // Web fonts are self-hosted via @font-face in style.css.
+    // Browsers fetch them only when a selector references them, so they
+    // load lazily based on the active style — no JS needed.
+
     // Sync the dropdown
     const sel = document.getElementById('setting-style');
     if (sel) sel.value = style;
@@ -1137,7 +1126,7 @@ function showLocationPicker(results) {
                 text-align:left;padding:0.5rem 0.75rem;background:var(--card-bg);color:var(--text);
                 border:1px solid var(--border);border-radius:6px;cursor:pointer;
                 font-size:0.9rem;transition:background 0.15s;
-            ">${r.name}, ${r.region}, ${r.country}</button>`;
+            ">${escapeHtml(r.name)}, ${escapeHtml(r.region)}, ${escapeHtml(r.country)}</button>`;
         });
         html += '</div>';
         container.innerHTML = html;
@@ -1516,9 +1505,9 @@ function displayPollenData(data) {
         <div class="pollen-scroll${fewClass}">
             ${items.map(p => `
                 <div class="pollen-item">
-                    <div class="detail-label">${p.name}</div>
-                    <div class="detail-value" style="color:${pollenIndexColor(p.value)};">${p.category}</div>
-                    <div style="font-size:0.7rem;color:var(--text-muted);">${p.value}/5</div>
+                    <div class="detail-label">${escapeHtml(p.name)}</div>
+                    <div class="detail-value" style="color:${pollenIndexColor(p.value)};">${escapeHtml(p.category)}</div>
+                    <div style="font-size:0.7rem;color:var(--text-muted);">${Number(p.value) || 0}/5</div>
                 </div>`).join('')}
         </div>
     `;
@@ -2078,19 +2067,36 @@ async function loadRadar(lat, lon) {
         const offsetX = 50 - (2 + fracX) / gridSize * 500;
         const offsetY = 50 - (2 + fracY) / gridSize * 500;
 
+        // Build a tile-grid <div> as a real DOM element so URLs from third-party
+        // APIs (RainViewer, CartoDB) can never break out of an HTML attribute.
         function buildTileGrid(tileSrcFn, extraStyle, defer) {
-            let html = `<div style="position:absolute;left:${offsetX}%;top:${offsetY}%;width:${gridSize * 100}%;height:${gridSize * 100}%;display:grid;grid-template-columns:repeat(${gridSize},1fr);${extraStyle || ''}">`;
+            const wrap = document.createElement('div');
+            wrap.style.cssText = `position:absolute;left:${offsetX}%;top:${offsetY}%;width:${gridSize * 100}%;height:${gridSize * 100}%;display:grid;grid-template-columns:repeat(${gridSize},1fr);${extraStyle || ''}`;
             for (let dy = -2; dy <= 2; dy++) {
                 for (let dx = -2; dx <= 2; dx++) {
                     const url = tileSrcFn(centerTileX + dx, centerTileY + dy);
+                    const img = document.createElement('img');
+                    img.alt = '';
+                    img.style.cssText = 'width:100%;height:100%;display:block;';
+                    img.dataset.retries = '0';
                     if (defer) {
-                        html += `<img data-src="${url}" alt="" style="width:100%;height:100%;display:block;" data-retries="0">`;
+                        img.dataset.src = url; // loaded later by loadFrame
                     } else {
-                        html += `<img src="${url}" alt="" style="width:100%;height:100%;display:block;" data-retries="0" onerror="if(this.dataset.retries<3){this.dataset.retries++;setTimeout(()=>{this.src=this.src+'&r='+this.dataset.retries},1000*this.dataset.retries)}else{this.style.visibility='hidden'}">`;
+                        img.src = url;
+                        img.onerror = function () {
+                            const tries = parseInt(this.dataset.retries || '0', 10);
+                            if (tries < 3) {
+                                this.dataset.retries = String(tries + 1);
+                                setTimeout(() => { this.src = url + '&r=' + (tries + 1); }, 1000 * (tries + 1));
+                            } else {
+                                this.style.visibility = 'hidden';
+                            }
+                        };
                     }
+                    wrap.appendChild(img);
                 }
             }
-            return html + '</div>';
+            return wrap.outerHTML;
         }
 
         // Map base layer
@@ -2120,6 +2126,22 @@ async function loadRadar(lat, lon) {
             </div>`;
 
         container.innerHTML = mapHtml + radarHtml + markerHtml;
+
+        // Attach error/retry handlers to eager-loaded tiles. Inline onerror
+        // attributes were removed (CSP-friendly + safer). We do this after
+        // innerHTML so newly-parsed <img> elements have the handler.
+        container.querySelectorAll('img[src]:not([data-src])').forEach(img => {
+            const original = img.src;
+            img.onerror = function () {
+                const tries = parseInt(this.dataset.retries || '0', 10);
+                if (tries < 3) {
+                    this.dataset.retries = String(tries + 1);
+                    setTimeout(() => { this.src = original + '&r=' + (tries + 1); }, 1000 * (tries + 1));
+                } else {
+                    this.style.visibility = 'hidden';
+                }
+            };
+        });
 
         // Show timestamp for latest frame
         const timeEl = document.getElementById('radar-time');
@@ -2711,16 +2733,23 @@ function getLocationFromURL() {
     const params = new URLSearchParams(window.location.search);
     // If lat/lon are in the URL, use them directly (skip geocoding/picker)
     if (params.get('lat') && params.get('lon')) {
-        return {
-            query: params.get('q') || '',
-            location: {
-                name: params.get('name') || '',
-                region: params.get('region') || '',
-                country: params.get('country') || '',
-                lat: parseFloat(params.get('lat')),
-                lon: parseFloat(params.get('lon')),
-            }
-        };
+        const lat = parseFloat(params.get('lat'));
+        const lon = parseFloat(params.get('lon'));
+        // Validate range — reject NaN, infinity, or out-of-bounds coords
+        if (Number.isFinite(lat) && Number.isFinite(lon) &&
+            lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+            return {
+                query: params.get('q') || '',
+                location: {
+                    name: params.get('name') || '',
+                    region: params.get('region') || '',
+                    country: params.get('country') || '',
+                    lat,
+                    lon,
+                }
+            };
+        }
+        // Fall through to query/hash handling on invalid coords
     }
     // Fallback to just query string
     if (params.get('q')) return { query: params.get('q'), location: null };
