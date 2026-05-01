@@ -315,6 +315,16 @@
 [data-style="bulletin"] body {
     font-feature-settings: 'tnum' 1, 'kern' 1;
 }
+/* Cutive's default line-height is too tight; ensure ascenders aren't clipped */
+[data-style="bulletin"] .hourly-item,
+[data-style="bulletin"] .hourly-item > div,
+[data-style="bulletin"] .forecast-day,
+[data-style="bulletin"] .forecast-date,
+[data-style="bulletin"] .forecast-temps,
+[data-style="bulletin"] .forecast-condition,
+[data-style="bulletin"] .forecast-precip {
+    line-height: 1.3;
+}
 [data-style="bulletin"] section h2 {
     font-weight: 400;
     letter-spacing: var(--section-letterspacing);
