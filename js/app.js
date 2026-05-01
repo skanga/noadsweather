@@ -1971,7 +1971,7 @@ function renderAlerts(alerts) {
             }
         }
         html += `
-            <div style="margin-bottom:0.9rem;">
+            <div class="alert-item">
                 <strong>${event}</strong>${translateLink}
                 <div style="font-size:0.85rem;margin-top:0.25rem;">${headline}</div>
                 ${descHtml}

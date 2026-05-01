@@ -908,6 +908,14 @@ section h2 {
     background: var(--alert-bg);
     border: 2px solid var(--alert-border);
     color: var(--alert-text);
+    margin-bottom: 1rem;
+}
+
+.alert-item {
+    margin-bottom: 0.9rem;
+}
+.alert-item:last-child {
+    margin-bottom: 0;
 }
 
 /* Weather summary */
