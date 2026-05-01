@@ -322,7 +322,13 @@
 [data-style="bulletin"] .forecast-date,
 [data-style="bulletin"] .forecast-temps,
 [data-style="bulletin"] .forecast-condition,
-[data-style="bulletin"] .forecast-precip {
+[data-style="bulletin"] .forecast-precip,
+[data-style="bulletin"] .pollen-item,
+[data-style="bulletin"] .pollen-item > div,
+[data-style="bulletin"] .detail-label,
+[data-style="bulletin"] .detail-value,
+[data-style="bulletin"] .astro-item,
+[data-style="bulletin"] .astro-item > div {
     line-height: 1.3;
 }
 [data-style="bulletin"] section h2 {
