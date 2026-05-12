@@ -2061,7 +2061,7 @@ function renderRadar(lat, lon) {
                 <div class="radar-progress-now-line"></div>
                 <div class="radar-progress-now-label">${t('radarNow')}</div>
             </div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;margin-top:0.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-top:0.5rem;">
             <div id="radar-time" style="font-size:0.8rem;color:#6b7280;"></div>
             <div class="radar-controls">
                 <button id="radar-pause" class="radar-ctrl-btn" title="Pause">⏸</button>
@@ -2270,15 +2270,17 @@ async function loadRadar(lat, lon) {
         const timeEl = document.getElementById('radar-time');
         const showFrameTime = (frame) => {
             const d = frameTime(frame);
+            const forecastTag = `<strong>(${escapeHtml(t('forecastLabel'))})</strong>`;
             if (!d) {
-                // Bad timestamp — show source label only (or blank)
-                timeEl.textContent = frame.source === 'future' ? t('forecastLabel') : '';
+                // Bad timestamp — show source tag only (or blank)
+                timeEl.innerHTML = frame.source === 'future' ? forecastTag : '';
                 return;
             }
             const timeStr = d.toLocaleTimeString(getCurrentLang(), { hour: 'numeric', minute: '2-digit' });
-            timeEl.textContent = frame.source === 'future'
-                ? `${timeStr} · ${t('forecastLabel')}`
-                : timeStr;
+            const timeEsc = escapeHtml(timeStr);
+            timeEl.innerHTML = frame.source === 'future'
+                ? `${timeEsc} ${forecastTag}`
+                : timeEsc;
         };
         showFrameTime(frames[nowIndex]);
 
@@ -2288,7 +2290,8 @@ async function loadRadar(lat, lon) {
         let currentFrame = nowIndex;
         const allFrameEls = container.querySelectorAll('.radar-frame');
 
-        // Wire the progress bar. Only visible if we actually have future frames.
+        // Wire the progress bar. Always visible when there are frames;
+        // the NOW line + label only show when forecast frames exist.
         const hasFuture = futureFrames.length > 0;
         const progressEl = document.getElementById('radar-progress');
         const pastBar = progressEl?.querySelector('.radar-progress-past');
@@ -2298,18 +2301,23 @@ async function loadRadar(lat, lon) {
         const markerEl = progressEl?.querySelector('.radar-progress-marker');
 
         if (progressEl) {
-            progressEl.hidden = !hasFuture;
-            if (hasFuture) {
-                // Past portion width = (nowIndex+1) / total * 100%
-                const pastPct = ((nowIndex + 1) / frames.length) * 100;
-                if (pastBar) pastBar.style.width = `${pastPct}%`;
-                if (nowLine) nowLine.style.left = `calc(${pastPct}% - 1px)`;
-                if (nowLabel) nowLabel.style.left = `${pastPct}%`;
+            progressEl.hidden = false;
+            // Past portion width: 100% if no future frames, else proportion of past.
+            const pastPct = hasFuture ? ((nowIndex + 1) / frames.length) * 100 : 100;
+            if (pastBar) pastBar.style.width = `${pastPct}%`;
+            if (futureBar) futureBar.style.display = hasFuture ? '' : 'none';
+            if (nowLine) {
+                nowLine.style.display = hasFuture ? '' : 'none';
+                nowLine.style.left = `calc(${pastPct}% - 1px)`;
+            }
+            if (nowLabel) {
+                nowLabel.style.display = hasFuture ? '' : 'none';
+                nowLabel.style.left = `${pastPct}%`;
             }
         }
 
         function updateProgressMarker(idx) {
-            if (!hasFuture || !markerEl) return;
+            if (!markerEl) return;
             const pct = ((idx + 0.5) / frames.length) * 100;
             markerEl.style.left = `${pct}%`;
         }
@@ -2351,6 +2359,19 @@ async function loadRadar(lat, lon) {
         }
         preloadNext();
 
+        // Single source of truth for switching to a frame.
+        // Used by the animation tick AND the progress-bar scrub handler.
+        function setFrame(idx) {
+            idx = Math.max(0, Math.min(frames.length - 1, idx));
+            if (idx === currentFrame) return;
+            allFrameEls[currentFrame].style.opacity = '0';
+            currentFrame = idx;
+            loadFrame(allFrameEls[currentFrame]);
+            allFrameEls[currentFrame].style.opacity = '1';
+            showFrameTime(frames[currentFrame]);
+            updateProgressMarker(currentFrame);
+        }
+
         let firstLoop = true;
 
         function startAnimation() {
@@ -2358,12 +2379,8 @@ async function loadRadar(lat, lon) {
             const speed = firstLoop ? speeds[1] : speeds[speedIdx]; // 0.5x on first loop
             radarInterval = setInterval(() => {
                 if (paused) return;
-                allFrameEls[currentFrame].style.opacity = '0';
-                currentFrame = (currentFrame + 1) % frames.length;
-                loadFrame(allFrameEls[currentFrame]);
-                allFrameEls[currentFrame].style.opacity = '1';
-                showFrameTime(frames[currentFrame]);
-                updateProgressMarker(currentFrame);
+                const next = (currentFrame + 1) % frames.length;
+                setFrame(next);
                 // After completing first loop, switch to user's speed
                 if (firstLoop && currentFrame === frames.length - 1) {
                     firstLoop = false;
@@ -2386,6 +2403,54 @@ async function loadRadar(lat, lon) {
             pauseBtn.textContent = paused ? '▶' : '⏸';
             pauseBtn.title = paused ? t('playRadar') : t('pauseRadar');
         });
+
+        // --- Scrub the progress bar (click or drag to change time) ---
+        if (progressEl) {
+            let scrubbing = false;
+
+            function frameFromEvent(e) {
+                const rect = progressEl.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const fraction = Math.max(0, Math.min(1, x / rect.width));
+                return Math.round(fraction * (frames.length - 1));
+            }
+
+            function pauseForScrub() {
+                paused = true;
+                if (pauseBtn) {
+                    pauseBtn.textContent = '▶';
+                    pauseBtn.title = t('playRadar');
+                }
+            }
+
+            progressEl.style.cursor = 'pointer';
+            progressEl.style.touchAction = 'none'; // prevent page scroll while dragging on mobile
+
+            progressEl.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                scrubbing = true;
+                progressEl.setPointerCapture(e.pointerId);
+                // Disable marker transition during drag so it tracks the pointer crisply
+                if (markerEl) markerEl.style.transition = 'none';
+                pauseForScrub();
+                setFrame(frameFromEvent(e));
+            });
+
+            progressEl.addEventListener('pointermove', (e) => {
+                if (!scrubbing) return;
+                setFrame(frameFromEvent(e));
+            });
+
+            function endScrub(e) {
+                if (!scrubbing) return;
+                scrubbing = false;
+                try { progressEl.releasePointerCapture(e.pointerId); } catch {}
+                if (markerEl) markerEl.style.transition = '';
+            }
+
+            progressEl.addEventListener('pointerup', endScrub);
+            progressEl.addEventListener('pointercancel', endScrub);
+        }
 
         const slowerBtn = document.getElementById('radar-slower');
         if (slowerBtn) slowerBtn.addEventListener('click', () => {
