@@ -2216,9 +2216,9 @@ async function loadRadar(lat, lon) {
                 return (tx, ty) => `${NOADSRADAR_BASE}/tile/${frame.minute}/${zoom}/${tx}/${ty}.png`;
             }
             // RainViewer past
-            // Color scheme 6 = NEXRAD Level III (classic NWS green→yellow→red),
-            // matches NoAdsRadar's forecast tile palette for visual consistency.
-            return (tx, ty) => `https://tilecache.rainviewer.com${frame.path}/256/${zoom}/${tx}/${ty}/6/1_0.png`;
+            // Color scheme 4 = The Weather Channel (TWC) — classic green→yellow→red
+            // palette that matches NoAdsRadar's forecast tile output.
+            return (tx, ty) => `https://tilecache.rainviewer.com${frame.path}/256/${zoom}/${tx}/${ty}/4/1_0.png`;
         }
 
         // Radar layers — eager-load the "NOW" frame (last past frame).
