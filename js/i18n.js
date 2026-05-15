@@ -3108,6 +3108,18 @@ function getCurrentLang() {
     return TRANSLATIONS[browser] ? browser : 'en';
 }
 
+// Returns a richer locale tag for date formatting, e.g. en-GB / fr-CA /
+// es-MX, when the browser's locale base matches the UI language. Falls
+// back to the plain UI language otherwise. This lets a UK English user
+// see 15/05 instead of 5/15 without needing to change the UI language.
+function getLocaleForDate() {
+    const ui = getCurrentLang();
+    const nav = navigator.language || '';
+    const navBase = nav.slice(0, 2).toLowerCase();
+    if (navBase === ui && nav.length > 2) return nav;
+    return ui;
+}
+
 function t(key, vars) {
     const lang = getCurrentLang();
     let str = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS.en[key] || key;

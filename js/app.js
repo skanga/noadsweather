@@ -1479,7 +1479,7 @@ function renderPollen(airQuality, lat, lon) {
         if (cachedData) {
             // Auto-show cached data
             section.innerHTML = `
-                <h2>${t('pollen')} <span style="text-transform:none;font-weight:400;font-size:0.85rem;color:var(--text-muted);">(${new Date().toLocaleDateString(getCurrentLang(), { month: 'long', day: 'numeric' })})</span></h2>
+                <h2>${t('pollen')} <span style="text-transform:none;font-weight:400;font-size:0.85rem;color:var(--text-muted);">(${new Date().toLocaleDateString(getLocaleForDate(), { month: 'long', day: 'numeric' })})</span></h2>
                 <div id="pollen-content"></div>
             `;
             displayPollenData(cachedData);
@@ -1530,7 +1530,7 @@ function displayPollenData(data) {
     // Update header with date
     const h2 = section.querySelector('h2');
     if (h2) {
-        h2.innerHTML = `${t('pollen')} <span style="text-transform:none;font-weight:400;font-size:0.85rem;color:var(--text-muted);">(${new Date().toLocaleDateString(getCurrentLang(), { month: 'long', day: 'numeric' })})</span>`;
+        h2.innerHTML = `${t('pollen')} <span style="text-transform:none;font-weight:400;font-size:0.85rem;color:var(--text-muted);">(${new Date().toLocaleDateString(getLocaleForDate(), { month: 'long', day: 'numeric' })})</span>`;
     }
 
     const fewClass = items.length <= 3 ? ' pollen-few' : '';
@@ -1627,8 +1627,8 @@ function renderDaily(daily, hourly) {
     let dayHeaderHtml = '';
     for (let i = 0; i < days; i++) {
         const date = new Date(daily.time[i] + 'T00:00:00');
-        const dayLabel = date.toLocaleDateString(getCurrentLang(), { weekday: 'short' });
-        const dateLabel = date.toLocaleDateString(getCurrentLang(), { month: 'numeric', day: 'numeric' });
+        const dayLabel = date.toLocaleDateString(getLocaleForDate(), { weekday: 'short' });
+        const dateLabel = date.toLocaleDateString(getLocaleForDate(), { month: 'numeric', day: 'numeric' });
         const info = weatherInfo(daily.weather_code[i]);
         const precip = daily.precipitation_sum[i];
         const minA = Math.min(...avgTemps);
@@ -1708,8 +1708,8 @@ function renderDaily(daily, hourly) {
                     <div style="width:${AXIS_W}px;min-width:${AXIS_W}px;flex-shrink:0;"></div>
                     ${daily.time.map((t, i) => {
                         const date = new Date(t + 'T00:00:00');
-                        const dayLabel = date.toLocaleDateString(getCurrentLang(), { weekday: 'short' });
-                        const dateLabel = date.toLocaleDateString(getCurrentLang(), { month: 'numeric', day: 'numeric' });
+                        const dayLabel = date.toLocaleDateString(getLocaleForDate(), { weekday: 'short' });
+                        const dateLabel = date.toLocaleDateString(getLocaleForDate(), { month: 'numeric', day: 'numeric' });
                         return `<div class="forecast-footer-day" style="width:${DAY_WIDTH}px;min-width:${DAY_WIDTH}px;">${dayLabel} ${dateLabel}</div>`;
                     }).join('')}
                     <div style="width:${AXIS_W}px;min-width:${AXIS_W}px;flex-shrink:0;"></div>
@@ -2504,7 +2504,7 @@ function renderSunMoon(daily, lat, lon, utcOffsetSeconds) {
 
     const fmtDate = (d) => {
         if (!d || isNaN(d)) return '';
-        return d.toLocaleDateString(getCurrentLang(), { month: 'long', day: 'numeric' });
+        return d.toLocaleDateString(getLocaleForDate(), { month: 'long', day: 'numeric' });
     };
 
     // Sun
