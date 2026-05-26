@@ -835,8 +835,20 @@ html[data-auto-resume] #home-view { display: none; }
     color: var(--text);
 }
 
+/* Footer links wrapper — holds Privacy + About side-by-side */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.footer-links .privacy-link {
+    display: inline;
+    margin: 0;
+}
+
 /* Fixed to bottom of screen (home page) */
-.privacy-link-fixed {
+.footer-links-fixed {
     position: fixed;
     bottom: 1.5rem;
     left: 50%;

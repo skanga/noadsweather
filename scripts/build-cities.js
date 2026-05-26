@@ -29,7 +29,10 @@ console.log(`Loaded ${cities.length} cities.`);
 // --- Generate pages ---------------------------------------------------------
 
 let pagesWritten = 0;
-const allPageUrls = [{ url: SITE_URL + '/', priority: '1.0' }];
+const allPageUrls = [
+    { url: SITE_URL + '/',       priority: '1.0' },
+    { url: SITE_URL + '/about/', priority: '0.9' },
+];
 const variantGroups = []; // for hreflang sitemap entries
 
 for (const city of cities) {
