@@ -10,6 +10,21 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#111827">
     <link rel="stylesheet" href="css/style.css">
+    <script>
+        // Auto-resume gate: if the user has the "Remember last city" setting
+        // on (default), no URL params are present, and a lastLocation is
+        // saved, mark the html element so CSS hides #home-view until app.js
+        // takes over and renders the weather view. Prevents flash-of-home.
+        (function () {
+            try {
+                var hasUrlLoc = /[?&](lat|q)=/.test(location.search) || location.hash.length > 1;
+                var remember = localStorage.getItem('rememberLastCity') !== 'false';
+                if (!hasUrlLoc && remember && localStorage.getItem('lastLocation')) {
+                    document.documentElement.setAttribute('data-auto-resume', 'true');
+                }
+            } catch (e) { /* private mode / no storage — fall through to home view */ }
+        })();
+    </script>
 </head>
 <body>
     <!-- Home View -->
@@ -103,6 +118,7 @@
                 <option value="quiet" data-i18n="styleQuiet">Quiet</option>
             </select>
         </label>
+        <label><input type="checkbox" id="setting-remember-city" data-setting="rememberLastCity" checked> <span data-i18n="settingRememberCity">Remember last city</span></label>
         <label><input type="checkbox" id="setting-forecast-colors" data-setting="showForecastColors" checked> <span data-i18n="settingForecastColors">Show color backgrounds on 10-day forecast</span></label>
         <label><input type="checkbox" id="setting-support-btn" data-setting="showSupportBtn" checked> <span data-i18n="settingSupportBtn">Show Annoying Support Button</span></label>
         <label><input type="checkbox" id="setting-weather-summary" data-setting="showWeatherSummary" checked> <span data-i18n="settingWeatherSummary">Show weather summary</span></label>

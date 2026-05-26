@@ -654,6 +654,12 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1rem;
 }
 
+/* Auto-resume gate — set by inline script in <head> when a lastLocation will
+   be restored. Hides #home-view until app.js renders the weather view, so
+   the user doesn't see the home page flash before being sent to their last
+   city. Cleared by app.js (in loadFromURL/showHome) when no longer needed. */
+html[data-auto-resume] #home-view { display: none; }
+
 /* Home View */
 .home-header {
     text-align: center;

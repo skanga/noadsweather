@@ -2779,6 +2779,9 @@ async function fetchAllWeatherData(lat, lon, country, region) {
 // --- Navigation & Event Listeners --------------------------------------------
 
 function showHome() {
+    // Make sure the auto-resume CSS gate isn't still hiding the home view
+    // (e.g. after popstate from a deep-link).
+    document.documentElement.removeAttribute('data-auto-resume');
     weatherView.hidden = true;
     homeView.hidden = false;
     searchInput.value = '';
@@ -2814,6 +2817,7 @@ searchForm.addEventListener('submit', async (e) => {
         updateURL(query, location);
         showWeather(location, query);
         fetchAllWeatherData(location.lat, location.lon, location.country, location.region);
+        saveLastLocation(query, location);
     } catch (err) {
         searchError.textContent = err.message;
         searchError.hidden = false;
@@ -2959,6 +2963,7 @@ document.getElementById('settings-revert').addEventListener('click', () => {
     localStorage.setItem('showSectionButtons', 'true');
     localStorage.setItem('showTranslateLink', 'true');
     localStorage.setItem('autoPlayRadar', 'false');
+    localStorage.setItem('rememberLastCity', 'true');
     localStorage.removeItem('sectionPrefs');
     applySettings();
     if (_lastLat !== null) {
@@ -3011,8 +3016,54 @@ function getLocationFromURL() {
     return null;
 }
 
+// "Remember last city" — persists the last successfully loaded location and
+// rehydrates it on bare visits to noadsweather.com. Uses the same shape as
+// getLocationFromURL so loadFromURL can consume it without branching.
+function saveLastLocation(query, location) {
+    if (!location || !Number.isFinite(location.lat) || !Number.isFinite(location.lon)) return;
+    try {
+        localStorage.setItem('lastLocation', JSON.stringify({
+            query: query || '',
+            name: location.name || '',
+            region: location.region || '',
+            country: location.country || '',
+            lat: location.lat,
+            lon: location.lon,
+        }));
+    } catch (e) { /* quota / private mode — ignore */ }
+}
+
+function getLocationFromStorage() {
+    let raw;
+    try { raw = localStorage.getItem('lastLocation'); } catch (e) { return null; }
+    if (!raw) return null;
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch (e) { return null; }
+    if (!parsed || typeof parsed !== 'object') return null;
+    const lat = parseFloat(parsed.lat);
+    const lon = parseFloat(parsed.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon) ||
+        lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+    return {
+        query: typeof parsed.query === 'string' ? parsed.query : '',
+        location: {
+            name: typeof parsed.name === 'string' ? parsed.name : '',
+            region: typeof parsed.region === 'string' ? parsed.region : '',
+            country: typeof parsed.country === 'string' ? parsed.country : '',
+            lat,
+            lon,
+        }
+    };
+}
+
 async function loadFromURL() {
-    const urlData = getLocationFromURL();
+    let urlData = getLocationFromURL();
+    // No URL params? Try the saved "last city" if the setting allows it.
+    if (!urlData && getSettingsBool('rememberLastCity')) {
+        urlData = getLocationFromStorage();
+    }
+    // Whether we resumed or not, the inline gate in <head> can now release.
+    document.documentElement.removeAttribute('data-auto-resume');
     if (!urlData) return;
 
     if (urlData.location) {
@@ -3020,6 +3071,7 @@ async function loadFromURL() {
         setUnitsForCountry(urlData.location.country);
         showWeather(urlData.location, urlData.query);
         fetchAllWeatherData(urlData.location.lat, urlData.location.lon, urlData.location.country, urlData.location.region);
+        saveLastLocation(urlData.query, urlData.location);
     } else if (urlData.query) {
         searchInput.value = urlData.query;
         searchForm.dispatchEvent(new Event('submit'));
