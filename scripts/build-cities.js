@@ -163,6 +163,22 @@ function renderTemplate(page) {
         `            </section>`;
     html = html.replace(/<section id="seo-blurb"[\s\S]*?<\/section>/, seoBlurbReplacement);
 
+    // 8. Swap visibility between home-view and weather-view on city pages.
+    //    Without this, Google's static-HTML pass sees the home view as the
+    //    primary content (since weather-view has `hidden`), making every
+    //    city page look like a generic search page with a hidden Auckland
+    //    H1 buried inside — triggers "soft 404 / doorway" classification.
+    //    Runtime behavior is unchanged: data-seo-city CSS already hides
+    //    home-view, and JS bootstraps the weather view as usual.
+    html = html.replace(
+        '<div id="home-view" class="view">',
+        '<div id="home-view" class="view" hidden>'
+    );
+    html = html.replace(
+        '<div id="weather-view" class="view" hidden>',
+        '<div id="weather-view" class="view">'
+    );
+
     return html;
 }
 
