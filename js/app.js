@@ -757,6 +757,12 @@ function applyTranslations() {
         if (attr) el.setAttribute(attr, text);
         else el.textContent = text;
     });
+    // Secondary aria-label translation — used on elements that already have
+    // data-i18n driving textContent (or another attribute) but also need a
+    // translated aria-label.
+    document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+        el.setAttribute('aria-label', t(el.dataset.i18nAriaLabel));
+    });
     const lang = getCurrentLang();
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
@@ -1102,7 +1108,7 @@ async function geocode(query) {
     }
 
     if (!data.results || data.results.length === 0) {
-        throw new Error('Location not found. Try a different city or zip code.');
+        throw new Error(t('locationNotFound'));
     }
 
     let results = data.results.map(r => ({
@@ -1156,14 +1162,14 @@ function matchesStateAbbr(abbr, fullName) {
 function showLocationPicker(results) {
     // Reset search button while picker is shown
     const btn = document.querySelector('#search-form button');
-    if (btn) { btn.disabled = false; btn.textContent = 'Search'; }
+    if (btn) { btn.disabled = false; btn.textContent = t('searchButton'); }
 
     return new Promise((resolve) => {
         const container = document.getElementById('search-error');
         container.hidden = false;
         container.style.color = '#1a1a1a';
 
-        let html = '<div style="margin-top:0.5rem;">Did you mean:</div>';
+        let html = `<div style="margin-top:0.5rem;">${t('didYouMean')}</div>`;
         html += '<div style="display:flex;flex-direction:column;gap:0.25rem;margin-top:0.5rem;">';
         results.forEach((r, i) => {
             html += `<button class="location-pick" data-idx="${i}" style="
@@ -1581,7 +1587,7 @@ async function loadPollenData(lat, lon) {
         displayPollenData(data);
     } catch (e) {
         const content = document.getElementById('pollen-content');
-        content.innerHTML = '<button id="pollen-btn" class="pollen-btn">Retry</button>';
+        content.innerHTML = `<button id="pollen-btn" class="pollen-btn">${t('retry')}</button>`;
         document.getElementById('pollen-btn').addEventListener('click', () => loadPollenData(lat, lon));
     }
 }
@@ -2072,9 +2078,9 @@ function renderRadar(lat, lon) {
     }
 
     section.innerHTML = `
-        <h2>Radar <button id="radar-refresh" class="radar-refresh-btn" title="Refresh radar">↻</button>${nwsLink}</h2>
+        <h2>${t('radar')} <button id="radar-refresh" class="radar-refresh-btn" title="${t('refreshRadar')}">↻</button>${nwsLink}</h2>
         <div id="radar-container" style="position:relative;width:100%;aspect-ratio:1;background:#1a1a2e;border-radius:8px;overflow:hidden;">
-            <div class="loading" style="color:#9ca3af;">Loading radar...</div>
+            <div class="loading" style="color:#9ca3af;">${t('loadingRadar')}</div>
         </div>
             <div id="radar-progress" class="radar-progress" hidden>
                 <div class="radar-progress-track">
@@ -2088,10 +2094,10 @@ function renderRadar(lat, lon) {
         <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;margin-top:0.5rem;">
             <div id="radar-time" style="font-size:0.8rem;color:#6b7280;"></div>
             <div class="radar-controls">
-                <button id="radar-pause" class="radar-ctrl-btn" title="Pause">⏸</button>
-                <button id="radar-slower" class="radar-ctrl-btn" title="Slower">−</button>
+                <button id="radar-pause" class="radar-ctrl-btn" title="${t('pauseRadar')}">⏸</button>
+                <button id="radar-slower" class="radar-ctrl-btn" title="${t('slowerRadar')}">−</button>
                 <span id="radar-speed-label" style="font-size:0.7rem;color:var(--text-muted);min-width:2.5rem;text-align:center;">1x</span>
-                <button id="radar-faster" class="radar-ctrl-btn" title="Faster">+</button>
+                <button id="radar-faster" class="radar-ctrl-btn" title="${t('fasterRadar')}">+</button>
             </div>
         </div>
     `;
@@ -2515,7 +2521,7 @@ async function loadRadar(lat, lon) {
 
     } catch {
         document.getElementById('radar-container').innerHTML =
-            '<div style="text-align:center;padding:2rem;color:#9ca3af;">Radar unavailable</div>';
+            `<div style="text-align:center;padding:2rem;color:#9ca3af;">${t('radarUnavailable')}</div>`;
     }
 }
 
@@ -2535,21 +2541,21 @@ function renderSunMoon(daily, lat, lon, utcOffsetSeconds) {
 
     const sunSection = document.getElementById('sun-section');
     sunSection.innerHTML = `
-        <h2>Sun <span style="text-transform:none;font-weight:400;font-size:0.85rem;color:var(--text-muted);">(${sunDateLabel})</span></h2>
+        <h2>${t('sun')} <span style="text-transform:none;font-weight:400;font-size:0.85rem;color:var(--text-muted);">(${sunDateLabel})</span></h2>
         <div class="astro-grid">
             <div class="astro-item">
                 <div style="font-size:1.5rem;">🌅</div>
-                <div class="label">Sunrise</div>
+                <div class="label">${t('sunrise')}</div>
                 <div class="value">${fmtTime(sunrise)}</div>
             </div>
             <div class="astro-item">
                 <div style="font-size:1.5rem;">☀️</div>
-                <div class="label">Solar Noon</div>
+                <div class="label">${t('solarNoon')}</div>
                 <div class="value">${fmtTime(solarNoon)}</div>
             </div>
             <div class="astro-item">
                 <div style="font-size:1.5rem;">🌇</div>
-                <div class="label">Sunset</div>
+                <div class="label">${t('sunset')}</div>
                 <div class="value">${fmtTime(sunset)}</div>
             </div>
         </div>
@@ -2569,13 +2575,13 @@ function renderSunMoon(daily, lat, lon, utcOffsetSeconds) {
     const firstItem = moonTimes.moonIsUp
         ? `<div class="astro-item">
                 <div style="font-size:1.5rem;">🌘</div>
-                <div class="label">Moonset</div>
+                <div class="label">${t('moonset')}</div>
                 <div class="value">${fmtTime(moonTimes.set)}</div>
                 <div class="label">${setDate}</div>
            </div>`
         : `<div class="astro-item">
                 <div style="font-size:1.5rem;">🌔</div>
-                <div class="label">Moonrise</div>
+                <div class="label">${t('moonrise')}</div>
                 <div class="value">${fmtTime(moonTimes.rise)}</div>
                 <div class="label">${riseDate}</div>
            </div>`;
@@ -2583,13 +2589,13 @@ function renderSunMoon(daily, lat, lon, utcOffsetSeconds) {
     const lastItem = moonTimes.moonIsUp
         ? `<div class="astro-item">
                 <div style="font-size:1.5rem;">🌔</div>
-                <div class="label">Moonrise</div>
+                <div class="label">${t('moonrise')}</div>
                 <div class="value">${fmtTime(moonTimes.rise)}</div>
                 <div class="label">${riseDate}</div>
            </div>`
         : `<div class="astro-item">
                 <div style="font-size:1.5rem;">🌘</div>
-                <div class="label">Moonset</div>
+                <div class="label">${t('moonset')}</div>
                 <div class="value">${fmtTime(moonTimes.set)}</div>
                 <div class="label">${setDate}</div>
            </div>`;
@@ -2600,7 +2606,7 @@ function renderSunMoon(daily, lat, lon, utcOffsetSeconds) {
             ${firstItem}
             <div class="astro-item">
                 <div style="font-size:1.5rem;">${moon.icon}</div>
-                <div class="label">Phase</div>
+                <div class="label">${t('phase')}</div>
                 <div class="value">${moon.name}</div>
             </div>
             ${lastItem}
@@ -2724,6 +2730,20 @@ function getDayOfYear(date) {
 let _lastLat = null, _lastLon = null, _lastCountry = null, _lastRegion = null;
 let _sunriseTime = null, _sunsetTime = null;
 
+// Race-protection token for fetchAllWeatherData. Each new call increments this;
+// in-flight render blocks check their captured token against the latest and bail
+// out if a newer call has superseded them, preventing stale data from clobbering
+// fresh UI on rapid location changes.
+let weatherLoadToken = 0;
+
+// Cached responses from the most recent successful fetch. Used by
+// rerenderWeatherFromCache() so presentational toggles (units, 12H/24H, theme)
+// can re-render without refetching from the network.
+let _lastMeteoData = null;
+let _lastAirQuality = null;
+let _lastAlerts = null;
+let _lastPickedLocation = null; // { lat, lon, country, region }
+
 function isNightTime(date) {
     if (!_sunriseTime || !_sunsetTime) return false;
     const t = date || new Date();
@@ -2737,13 +2757,25 @@ function isHourNight(hourStr) {
 }
 
 async function fetchAllWeatherData(lat, lon, country, region) {
+    const myToken = ++weatherLoadToken;
     _lastLat = lat;
     _lastLon = lon;
     _lastCountry = country || _lastCountry || '';
     _lastRegion = region || _lastRegion || '';
+    _lastPickedLocation = {
+        lat,
+        lon,
+        country: _lastCountry,
+        region: _lastRegion,
+    };
+    // Invalidate caches so toggles can't re-render with stale data while a
+    // fresh fetch is still in flight.
+    _lastMeteoData = null;
+    _lastAirQuality = null;
+    _lastAlerts = null;
     document.getElementById('alerts-section').hidden = true;
     document.getElementById('weather-summary').textContent = '';
-    document.getElementById('current-section').innerHTML = '<div class="loading">Loading...</div>';
+    document.getElementById('current-section').innerHTML = `<div class="loading">${t('loading')}</div>`;
     document.getElementById('details-section').innerHTML = '';
     document.getElementById('hourly-section').innerHTML = '';
     document.getElementById('daily-section').innerHTML = '';
@@ -2755,6 +2787,9 @@ async function fetchAllWeatherData(lat, lon, country, region) {
 
     // Weather data — renders most of the page
     const meteoPromise = fetchOpenMeteo(lat, lon).then(meteo => {
+        // Bail if a newer fetchAllWeatherData call has superseded us
+        if (myToken !== weatherLoadToken) return null;
+        _lastMeteoData = meteo;
         _sunriseTime = new Date(meteo.daily.sunrise[0]);
         _sunsetTime = new Date(meteo.daily.sunset[0]);
         document.getElementById('weather-summary').textContent =
@@ -2766,14 +2801,18 @@ async function fetchAllWeatherData(lat, lon, country, region) {
         applySectionPreferences();
         return meteo;
     }).catch(() => {
+        if (myToken !== weatherLoadToken) return null;
         document.getElementById('current-section').innerHTML =
-            `<p class="error">Failed to load weather data. Please try again.</p>`;
+            `<p class="error">${t('failedToLoadWeather')}</p>`;
         return null;
     });
 
     // AQI + Pollen — update current conditions and pollen when ready
     fetchAirQuality(lat, lon).then(airQuality => {
+        if (myToken !== weatherLoadToken) return;
+        _lastAirQuality = airQuality;
         meteoPromise.then(meteo => {
+            if (myToken !== weatherLoadToken) return;
             if (meteo && airQuality) {
                 renderCurrent(meteo.current, airQuality);
                 applySectionPreferences();
@@ -2785,15 +2824,44 @@ async function fetchAllWeatherData(lat, lon, country, region) {
 
     // Alerts — render independently
     fetchAlerts(lat, lon, _lastCountry, _lastRegion).then(alerts => {
+        if (myToken !== weatherLoadToken) return;
+        _lastAlerts = alerts;
         renderAlerts(alerts);
         applySectionPreferences();
     }).catch(() => {});
 
     // Radar — render independently (has its own loading state)
     meteoPromise.then(() => {
+        if (myToken !== weatherLoadToken) return;
         renderRadar(lat, lon);
         applySectionPreferences();
     });
+}
+
+// Re-render weather UI from the cached responses captured by the most recent
+// fetchAllWeatherData call. Used by presentational toggles (units, 12H/24H,
+// theme) so they don't trigger redundant API calls. Radar is NOT re-rendered
+// here — it has its own state and isn't a function of units/time-format.
+function rerenderWeatherFromCache() {
+    if (!_lastMeteoData || !_lastPickedLocation) return;
+    const meteo = _lastMeteoData;
+    const airQuality = _lastAirQuality;
+    const alerts = _lastAlerts;
+    const { lat, lon } = _lastPickedLocation;
+
+    document.getElementById('weather-summary').textContent =
+        generateSummary(meteo.current, meteo.hourly, meteo.daily);
+    renderCurrent(meteo.current, airQuality);
+    renderHourly(meteo.hourly);
+    renderDaily(meteo.daily, meteo.hourly);
+    renderSunMoon(meteo.daily, lat, lon, meteo.utc_offset_seconds);
+    if (airQuality) {
+        renderPollen(airQuality, lat, lon);
+    }
+    if (alerts !== null && alerts !== undefined) {
+        renderAlerts(alerts);
+    }
+    applySectionPreferences();
 }
 
 // --- Navigation & Event Listeners --------------------------------------------
@@ -2829,7 +2897,7 @@ searchForm.addEventListener('submit', async (e) => {
 
     searchError.hidden = true;
     searchForm.querySelector('button').disabled = true;
-    searchForm.querySelector('button').textContent = 'Searching...';
+    searchForm.querySelector('button').textContent = t('searching');
 
     try {
         const location = await geocode(query);
@@ -2843,7 +2911,7 @@ searchForm.addEventListener('submit', async (e) => {
         searchError.hidden = false;
     } finally {
         searchForm.querySelector('button').disabled = false;
-        searchForm.querySelector('button').textContent = 'Search';
+        searchForm.querySelector('button').textContent = t('searchButton');
     }
 });
 
@@ -2854,18 +2922,16 @@ backBtn.addEventListener('click', () => {
 
 document.getElementById('units-toggle').addEventListener('click', () => {
     toggleUnits();
-    if (_lastLat !== null) {
-        fetchAllWeatherData(_lastLat, _lastLon, _lastCountry, _lastRegion);
-    }
+    // Units are presentational — re-render from cached data instead of refetching.
+    rerenderWeatherFromCache();
 });
 
 document.getElementById('time-toggle').addEventListener('click', () => {
     units.time24h = !units.time24h;
     updateUnitsToggleLabel();
     saveUnitsPref();
-    if (_lastLat !== null) {
-        fetchAllWeatherData(_lastLat, _lastLon, _lastCountry, _lastRegion);
-    }
+    // Time format is presentational — re-render from cached data instead of refetching.
+    rerenderWeatherFromCache();
 });
 
 // --- Layout Lock -------------------------------------------------------------
@@ -3322,7 +3388,13 @@ initChartDrag();
         localStorage.setItem('theme', theme);
         updateDayBackgrounds();
         applySettings();
-        if (_lastLat !== null) renderRadar(_lastLat, _lastLon);
+        // Re-render weather from cache so any theme-dependent rendering (e.g.
+        // colors in renderDaily) refreshes without a network refetch.
+        rerenderWeatherFromCache();
+        // NOTE: We intentionally do NOT call renderRadar here. The radar's
+        // CartoDB basemap will keep its previous theme until the next manual
+        // refresh or location change. Accepted trade-off — avoids a full
+        // radar API refetch (RainViewer + NoAdsRadar) on every theme toggle.
     }
 
     // Initialize: use stored preference, fall back to OS preference

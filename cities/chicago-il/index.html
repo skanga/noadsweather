@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://tilecache.rainviewer.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://noadsradar-tilesvc-15838356607.us-central1.run.app; connect-src 'self' https://api.open-meteo.com https://geocoding-api.open-meteo.com https://air-quality-api.open-meteo.com https://api.weather.gov https://api.rainviewer.com https://api.zippopotam.us https://alerts-proxy-ssdjubgioq-uc.a.run.app https://pollen-proxy-15838356607.us-central1.run.app https://noadsradar-tilesvc-15838356607.us-central1.run.app; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>Chicago IL Weather with No Ads — NoAdsWeather</title>
     <meta name="description" content="Get the Chicago IL weather forecast without ads, cookies, or tracking. Open-Meteo data, 10-day forecast, hourly conditions, and radar — all free.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛅</text></svg>">
@@ -14,6 +16,8 @@
     <link rel="alternate" hreflang="x-default" href="https://noadsweather.com/cities/chicago-il/">
     <script>
         window._seoCity = {"slug":"chicago-il","lang":"en","lat":41.8781,"lon":-87.6298,"name":"Chicago IL","displayName":"Chicago IL","country":"US","region":"IL"};
+        document.documentElement.setAttribute('data-seo-city', 'true');
+        try { if (localStorage.getItem('hideCitySeoBlurb') === 'true') document.documentElement.setAttribute('data-blurb-dismissed', 'true'); } catch (e) {}
     </script>
     <link rel="stylesheet" href="/css/style.css">
     <script>
@@ -79,28 +83,28 @@
     <div id="weather-view" class="view" hidden>
         <header class="weather-header">
             <div class="weather-toolbar">
-                <button id="back-btn" data-i18n="back" aria-label="Back to search">&larr; Back</button>
+                <button id="back-btn" data-i18n="back" data-i18n-aria-label="backToSearch" aria-label="Back to search">&larr; Back</button>
                 <div class="weather-toggles">
                     <button id="units-toggle" class="units-toggle">°F</button>
                     <button id="time-toggle" class="units-toggle">12H</button>
                     <button id="lock-toggle" class="units-toggle" data-i18n="lockLayout" data-i18n-attr="title" title="Lock layout">🔓</button>
                 </div>
             </div>
-            <h1 id="location-name"></h1>
+            <h1 id="location-name">Chicago IL Weather with No Ads</h1>
         </header>
         <main id="weather-content">
             <!-- SEO blurb — shown only on generated city landing pages.
                  Populated by js/app.js when window._seoCity is set. Dismissed
                  permanently to localStorage key 'hideCitySeoBlurb'. -->
-            <section id="seo-blurb" hidden>
+            <section id="seo-blurb">
                 <button id="seo-blurb-close" aria-label="Hide" type="button">&times;</button>
                 <p>
-                    <span id="seo-blurb-text"></span>
-                    <a href="#" id="seo-blurb-hide-link"></a>
+                    <span id="seo-blurb-text">Get the Chicago IL weather forecast without ads, cookies, or tracking. Open-Meteo data, 10-day forecast, hourly conditions, and radar — all free.</span>
+                    <a href="#" id="seo-blurb-hide-link">click here to hide this</a>
                 </p>
             </section>
-            <section id="alerts-section" hidden></section>
-            <p id="weather-summary"></p>
+            <section id="alerts-section" role="alert" aria-live="assertive" hidden></section>
+            <p id="weather-summary" aria-live="polite"></p>
             <section id="current-section"></section>
             <section id="details-section"></section>
             <section id="hourly-section"></section>
@@ -119,7 +123,7 @@
 
     <!-- Privacy panel (shared, hidden by default) -->
     <div id="privacy-panel" hidden>
-        <button id="privacy-close" aria-label="Close">&times;</button>
+        <button id="privacy-close" data-i18n="close" data-i18n-attr="aria-label" aria-label="Close">&times;</button>
         <p id="i18n-disclaimer" data-i18n="machineTranslationNotice" hidden></p>
         <p><strong>No cookies. No tracking. No ads.</strong></p>
         <p>This site does not use cookies, does not track your location, and does not collect any personal information. We don't use analytics, fingerprinting, or any form of user tracking.</p>
@@ -140,8 +144,8 @@
     </div>
 
     <!-- Theme toggle + settings button (both floating, bottom-left) -->
-    <button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
-    <button id="settings-toggle" data-i18n="settings" data-i18n-attr="title" title="Settings" aria-label="Settings">⚙️</button>
+    <button id="theme-toggle" data-i18n="toggleTheme" data-i18n-attr="aria-label" aria-label="Toggle dark mode">🌙</button>
+    <button id="settings-toggle" data-i18n="settings" data-i18n-attr="title" data-i18n-aria-label="settings" title="Settings" aria-label="Settings">⚙️</button>
 
     <!-- Settings popover (floating, hidden by default) -->
     <div id="settings-popover" hidden>

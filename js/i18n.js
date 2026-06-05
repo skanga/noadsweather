@@ -221,7 +221,18 @@ const TRANSLATIONS = {
 
         // Misc short labels
         highTemp: 'High',
-        lowTemp: 'Low'
+        lowTemp: 'Low',
+
+        // Search / errors / aria-labels
+        searching: 'Searching...',
+        didYouMean: 'Did you mean:',
+        locationNotFound: 'Location not found. Try a different city or zip code.',
+        failedToLoadWeather: 'Failed to load weather data. Please try again.',
+        retry: 'Retry',
+        hide: 'Hide',
+        close: 'Close',
+        toggleTheme: 'Toggle dark mode',
+        backToSearch: 'Back to search'
     },
 
     es: {
@@ -430,7 +441,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Máx',
-        lowTemp: 'Mín'
+        lowTemp: 'Mín',
+
+        // Search / errors / aria-labels
+        searching: 'Buscando...',
+        didYouMean: '¿Quisiste decir:',
+        locationNotFound: 'Ubicación no encontrada. Prueba con otra ciudad o código postal.',
+        failedToLoadWeather: 'No se pudieron cargar los datos del clima. Inténtalo de nuevo.',
+        retry: 'Reintentar',
+        hide: 'Ocultar',
+        close: 'Cerrar',
+        toggleTheme: 'Cambiar modo oscuro',
+        backToSearch: 'Volver a la búsqueda'
     },
 
     fr: {
@@ -639,7 +661,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Max',
-        lowTemp: 'Min'
+        lowTemp: 'Min',
+
+        // Search / errors / aria-labels
+        searching: 'Recherche...',
+        didYouMean: 'Vouliez-vous dire :',
+        locationNotFound: 'Lieu introuvable. Essayez une autre ville ou un autre code postal.',
+        failedToLoadWeather: 'Échec du chargement des données météo. Veuillez réessayer.',
+        retry: 'Réessayer',
+        hide: 'Masquer',
+        close: 'Fermer',
+        toggleTheme: 'Basculer le mode sombre',
+        backToSearch: 'Retour à la recherche'
     },
 
     de: {
@@ -848,7 +881,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Max',
-        lowTemp: 'Min'
+        lowTemp: 'Min',
+
+        // Search / errors / aria-labels
+        searching: 'Suche...',
+        didYouMean: 'Meintest du:',
+        locationNotFound: 'Standort nicht gefunden. Versuche eine andere Stadt oder Postleitzahl.',
+        failedToLoadWeather: 'Wetterdaten konnten nicht geladen werden. Bitte erneut versuchen.',
+        retry: 'Erneut versuchen',
+        hide: 'Ausblenden',
+        close: 'Schließen',
+        toggleTheme: 'Dunkelmodus umschalten',
+        backToSearch: 'Zurück zur Suche'
     },
 
     it: {
@@ -1057,7 +1101,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Max',
-        lowTemp: 'Min'
+        lowTemp: 'Min',
+
+        // Search / errors / aria-labels
+        searching: 'Ricerca...',
+        didYouMean: 'Forse cercavi:',
+        locationNotFound: 'Posizione non trovata. Prova con un\'altra città o CAP.',
+        failedToLoadWeather: 'Impossibile caricare i dati meteo. Riprova.',
+        retry: 'Riprova',
+        hide: 'Nascondi',
+        close: 'Chiudi',
+        toggleTheme: 'Attiva/disattiva modalità scura',
+        backToSearch: 'Torna alla ricerca'
     },
 
     pt: {
@@ -1266,7 +1321,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Máx',
-        lowTemp: 'Mín'
+        lowTemp: 'Mín',
+
+        // Search / errors / aria-labels
+        searching: 'Buscando...',
+        didYouMean: 'Você quis dizer:',
+        locationNotFound: 'Local não encontrado. Tente outra cidade ou CEP.',
+        failedToLoadWeather: 'Falha ao carregar os dados do clima. Tente novamente.',
+        retry: 'Tentar novamente',
+        hide: 'Ocultar',
+        close: 'Fechar',
+        toggleTheme: 'Alternar modo escuro',
+        backToSearch: 'Voltar à busca'
     },
 
     nl: {
@@ -1475,7 +1541,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Max',
-        lowTemp: 'Min'
+        lowTemp: 'Min',
+
+        // Search / errors / aria-labels
+        searching: 'Zoeken...',
+        didYouMean: 'Bedoelde je:',
+        locationNotFound: 'Locatie niet gevonden. Probeer een andere stad of postcode.',
+        failedToLoadWeather: 'Kan weergegevens niet laden. Probeer het opnieuw.',
+        retry: 'Opnieuw',
+        hide: 'Verbergen',
+        close: 'Sluiten',
+        toggleTheme: 'Donkere modus wisselen',
+        backToSearch: 'Terug naar zoeken'
     },
 
     pl: {
@@ -1684,7 +1761,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Maks',
-        lowTemp: 'Min'
+        lowTemp: 'Min',
+
+        // Search / errors / aria-labels
+        searching: 'Szukam...',
+        didYouMean: 'Czy chodziło Ci o:',
+        locationNotFound: 'Nie znaleziono lokalizacji. Spróbuj innego miasta lub kodu pocztowego.',
+        failedToLoadWeather: 'Nie udało się załadować danych pogodowych. Spróbuj ponownie.',
+        retry: 'Ponów',
+        hide: 'Ukryj',
+        close: 'Zamknij',
+        toggleTheme: 'Przełącz tryb ciemny',
+        backToSearch: 'Powrót do wyszukiwania'
     },
 
     sv: {
@@ -1893,7 +1981,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Max',
-        lowTemp: 'Min'
+        lowTemp: 'Min',
+
+        // Search / errors / aria-labels
+        searching: 'Söker...',
+        didYouMean: 'Menade du:',
+        locationNotFound: 'Plats hittades inte. Försök med en annan stad eller postnummer.',
+        failedToLoadWeather: 'Det gick inte att läsa in väderdata. Försök igen.',
+        retry: 'Försök igen',
+        hide: 'Dölj',
+        close: 'Stäng',
+        toggleTheme: 'Växla mörkt läge',
+        backToSearch: 'Tillbaka till sökning'
     },
 
     ru: {
@@ -2102,7 +2201,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'Макс',
-        lowTemp: 'Мин'
+        lowTemp: 'Мин',
+
+        // Search / errors / aria-labels
+        searching: 'Поиск...',
+        didYouMean: 'Возможно, вы имели в виду:',
+        locationNotFound: 'Местоположение не найдено. Попробуйте другой город или почтовый индекс.',
+        failedToLoadWeather: 'Не удалось загрузить данные о погоде. Попробуйте снова.',
+        retry: 'Повторить',
+        hide: 'Скрыть',
+        close: 'Закрыть',
+        toggleTheme: 'Переключить тёмный режим',
+        backToSearch: 'Назад к поиску'
     },
 
     ja: {
@@ -2311,7 +2421,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: '最高',
-        lowTemp: '最低'
+        lowTemp: '最低',
+
+        // Search / errors / aria-labels
+        searching: '検索中...',
+        didYouMean: 'もしかして：',
+        locationNotFound: '場所が見つかりません。別の都市または郵便番号をお試しください。',
+        failedToLoadWeather: '天気データの読み込みに失敗しました。もう一度お試しください。',
+        retry: '再試行',
+        hide: '非表示',
+        close: '閉じる',
+        toggleTheme: 'ダークモード切替',
+        backToSearch: '検索に戻る'
     },
 
     zh: {
@@ -2520,7 +2641,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: '最高',
-        lowTemp: '最低'
+        lowTemp: '最低',
+
+        // Search / errors / aria-labels
+        searching: '搜索中...',
+        didYouMean: '您是不是想找：',
+        locationNotFound: '未找到位置。请尝试其他城市或邮政编码。',
+        failedToLoadWeather: '加载天气数据失败。请重试。',
+        retry: '重试',
+        hide: '隐藏',
+        close: '关闭',
+        toggleTheme: '切换深色模式',
+        backToSearch: '返回搜索'
     },
 
     ko: {
@@ -2729,7 +2861,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: '최고',
-        lowTemp: '최저'
+        lowTemp: '최저',
+
+        // Search / errors / aria-labels
+        searching: '검색 중...',
+        didYouMean: '다음을 찾으셨나요:',
+        locationNotFound: '위치를 찾을 수 없습니다. 다른 도시나 우편번호를 시도해 보세요.',
+        failedToLoadWeather: '날씨 데이터를 불러오지 못했습니다. 다시 시도해 주세요.',
+        retry: '다시 시도',
+        hide: '숨기기',
+        close: '닫기',
+        toggleTheme: '다크 모드 전환',
+        backToSearch: '검색으로 돌아가기'
     },
 
     ar: {
@@ -2938,7 +3081,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'العظمى',
-        lowTemp: 'الصغرى'
+        lowTemp: 'الصغرى',
+
+        // Search / errors / aria-labels
+        searching: 'جارٍ البحث...',
+        didYouMean: 'هل تقصد:',
+        locationNotFound: 'لم يتم العثور على الموقع. جرّب مدينة أو رمزًا بريديًا آخر.',
+        failedToLoadWeather: 'فشل تحميل بيانات الطقس. حاول مرة أخرى.',
+        retry: 'إعادة المحاولة',
+        hide: 'إخفاء',
+        close: 'إغلاق',
+        toggleTheme: 'تبديل الوضع الداكن',
+        backToSearch: 'العودة إلى البحث'
     },
 
     hi: {
@@ -3147,7 +3301,18 @@ const TRANSLATIONS = {
 
         // Misc
         highTemp: 'अधिकतम',
-        lowTemp: 'न्यूनतम'
+        lowTemp: 'न्यूनतम',
+
+        // Search / errors / aria-labels
+        searching: 'खोज रहा है...',
+        didYouMean: 'क्या आपका मतलब था:',
+        locationNotFound: 'स्थान नहीं मिला। दूसरा शहर या पिन कोड आज़माएँ।',
+        failedToLoadWeather: 'मौसम डेटा लोड नहीं हो सका। कृपया फिर से प्रयास करें।',
+        retry: 'पुनः प्रयास',
+        hide: 'छिपाएँ',
+        close: 'बंद करें',
+        toggleTheme: 'डार्क मोड टॉगल करें',
+        backToSearch: 'खोज पर वापस'
     }
 };
 

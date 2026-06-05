@@ -660,6 +660,12 @@ h1, h2, h3, h4, h5, h6 {
    city. Cleared by app.js (in loadFromURL/showHome) when no longer needed. */
 html[data-auto-resume] #home-view { display: none; }
 
+/* SEO city pages: hide home view immediately on cold load (no flash before
+   app.js runs), and hide blurb if the user previously dismissed it. Set by
+   the inline head script in generated /cities/* pages. */
+html[data-seo-city] #home-view { display: none; }
+html[data-blurb-dismissed] #seo-blurb { display: none !important; }
+
 /* SEO blurb — visible on /cities/* landing pages only. Dismissed permanently
    via the X button or the inline link, persisted in localStorage. */
 #seo-blurb {

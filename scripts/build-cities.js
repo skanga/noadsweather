@@ -140,6 +140,29 @@ function renderTemplate(page) {
     html = html.replace(/<script src="js\/app\.js"><\/script>/,
         '<script src="/js/app.js"></script>');
 
+    // 6. Pre-fill the H1 so the page has unique body content even before
+    //    app.js runs (avoids the doorway-page risk of 77 byte-identical
+    //    pages). app.js will overwrite this with the formatted city/region
+    //    label once the weather view loads.
+    html = html.replace(/<h1 id="location-name"><\/h1>/,
+        `<h1 id="location-name">${escapeHtml(page.title)}</h1>`);
+
+    // 7. Pre-fill the SEO blurb section. The hidden attribute is dropped so
+    //    the blurb is visible on first paint (app.js still wires up the
+    //    dismiss handlers once it boots). The inline head script sets
+    //    data-blurb-dismissed on <html> when the user previously hid it.
+    const hideLinkText = (translations[page.lang] && translations[page.lang].cityPageHideBlurb)
+        || translations.en.cityPageHideBlurb;
+    const seoBlurbReplacement =
+        `<section id="seo-blurb">\n` +
+        `                <button id="seo-blurb-close" aria-label="Hide" type="button">&times;</button>\n` +
+        `                <p>\n` +
+        `                    <span id="seo-blurb-text">${escapeHtml(page.description)}</span>\n` +
+        `                    <a href="#" id="seo-blurb-hide-link">${escapeHtml(hideLinkText)}</a>\n` +
+        `                </p>\n` +
+        `            </section>`;
+    html = html.replace(/<section id="seo-blurb"[\s\S]*?<\/section>/, seoBlurbReplacement);
+
     return html;
 }
 
@@ -161,6 +184,14 @@ function buildHeadInjection(page) {
     }
     lines.push('    <script>');
     lines.push(`        window._seoCity = ${JSON.stringify(page.seoCity).replace(/</g, '\\u003c')};`);
+    // Flash-gate: hide #home-view immediately so generated city pages don't
+    // render the home view for one frame before app.js routes to the weather
+    // view. Cleared by app.js once the city is loaded.
+    lines.push(`        document.documentElement.setAttribute('data-seo-city', 'true');`);
+    // If the user previously dismissed the SEO blurb, hide it before paint
+    // so it doesn't flash in. Wrapped in try-catch because localStorage can
+    // throw in private-mode / disabled-storage contexts.
+    lines.push(`        try { if (localStorage.getItem('hideCitySeoBlurb') === 'true') document.documentElement.setAttribute('data-blurb-dismissed', 'true'); } catch (e) {}`);
     lines.push('    </script>');
     return lines.join('\n');
 }

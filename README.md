@@ -28,7 +28,7 @@ Weather websites are some of the most bloated pages on the internet. A typical w
 
 ## Tech Stack
 
-- **Frontend:** Plain HTML, CSS, vanilla JavaScript — no frameworks, no build step, no npm
+- **Frontend:** Plain HTML, CSS, vanilla JavaScript — no frameworks, no bundler, no npm dependencies at runtime
 - **Hosting:** GitHub Pages (free)
 - **Weather data:** [Open-Meteo API](https://open-meteo.com/) (free, no API key)
 - **Radar:** [RainViewer API](https://www.rainviewer.com/api.html) (free) + [CartoDB](https://carto.com/basemaps/) map tiles
@@ -39,7 +39,7 @@ Weather websites are some of the most bloated pages on the internet. A typical w
 
 ## Running Locally
 
-No build step required. Just serve the files:
+No build step is required to serve the site. Just serve the files:
 
 ```bash
 npx http-server . -p 8080
@@ -47,15 +47,35 @@ npx http-server . -p 8080
 
 Then open `http://localhost:8080`.
 
+### Regenerating city pages
+
+There is one optional build script: `scripts/build-cities.js`. It regenerates the 77 static city pages under `cities/` plus `sitemap.xml`. You only need to re-run it when you edit either:
+
+- `scripts/cities.json` (the city list), or
+- the city-page i18n keys in `js/i18n.js` (`cityPageTitle`, `cityPageSeoBlurb`, `cityPageHideBlurb`).
+
+```bash
+node scripts/build-cities.js
+```
+
+The generated `cities/` directory is committed to the repo so GitHub Pages can serve it directly.
+
 ## Project Structure
 
 ```
-index.html          — Single page with all HTML structure
+index.html          — Single-page app entry; also the template used by build-cities.js
+privacy.html        — Standalone privacy page
+about/              — Standalone about page
 css/style.css       — All styles with CSS custom properties for theming
-js/app.js           — All application logic (~2100 lines)
-js/app-commented.js — Fully commented version of app.js
+js/app.js           — All application logic (~3362 lines)
+js/i18n.js          — TRANSLATIONS object (15 languages)
+fonts/, img/        — Static assets
+scripts/            — build-cities.js + cities.json (generates city pages + sitemap.xml)
+cities/             — 77 generated city pages (committed)
+alerts-proxy/       — Cloud Run proxy for NWS alerts
+pollen-proxy/       — Cloud Run proxy for Google Pollen API
+robots.txt, sitemap.xml
 CNAME               — Custom domain config for GitHub Pages
-.nojekyll           — Tells GitHub Pages to skip Jekyll processing
 LICENSE             — MIT License
 ```
 
