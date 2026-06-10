@@ -819,7 +819,11 @@ function getMoonPhase(date) {
     return { name, icon };
 }
 
-const TEMP_COLOR_THRESHOLD = 5; // °F — don't colorize if range is less than this
+// Don't colorize the 10-day forecast when the day-to-day temperature range
+// is small. Unit-aware: the same physical range is a smaller number in
+// Celsius (5°F ≈ 2.8°C), so a fixed threshold would behave differently
+// between unit systems.
+function tempColorThreshold() { return isImperial() ? 5 : 3; }
 
 // Settings that default to FALSE when not explicitly set. Everything else defaults to true.
 const SETTINGS_DEFAULT_FALSE = new Set(['autoPlayRadar']);
@@ -832,7 +836,7 @@ function getSettingsBool(key) {
 
 function tempBackground(avg, minAvg, avgRange) {
     if (!getSettingsBool('showForecastColors')) return 'transparent';
-    if (avgRange < TEMP_COLOR_THRESHOLD) return 'transparent';
+    if (avgRange < tempColorThreshold()) return 'transparent';
     const t = (avg - minAvg) / avgRange;
     if (isDarkMode()) {
         const r = Math.round(20 + t * 40);
@@ -1647,7 +1651,7 @@ function renderDaily(daily, hourly) {
     // Store globally so theme toggle can recompute
     window._forecastAvgTemps = avgTemps;
     const tempRange = Math.max(...avgTemps) - Math.min(...avgTemps);
-    const showTempColors = tempRange >= TEMP_COLOR_THRESHOLD && getSettingsBool('showForecastColors');
+    const showTempColors = tempRange >= tempColorThreshold() && getSettingsBool('showForecastColors');
 
     // --- Day column header (inside scroll) ---
     let dayHeaderHtml = '';
@@ -2922,8 +2926,14 @@ backBtn.addEventListener('click', () => {
 
 document.getElementById('units-toggle').addEventListener('click', () => {
     toggleUnits();
-    // Units are presentational — re-render from cached data instead of refetching.
-    rerenderWeatherFromCache();
+    // Units are NOT purely presentational: Open-Meteo returns data in the
+    // requested units (temperature_unit/wind_speed_unit/precipitation_unit),
+    // so cached data is baked in the old units and must be refetched.
+    // Re-rendering from cache would relabel 24°C as 24°F without converting.
+    if (_lastPickedLocation) {
+        const { lat, lon, country, region } = _lastPickedLocation;
+        fetchAllWeatherData(lat, lon, country, region);
+    }
 });
 
 document.getElementById('time-toggle').addEventListener('click', () => {
