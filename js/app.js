@@ -107,20 +107,20 @@ function fmtPrecip(val) {
 // --- Section Preferences System -----------------------------------------------
 
 const DEFAULT_SECTION_ORDER = [
-    'current-section', 'details-section', 'hourly-section', 'daily-section',
-    'radar-section', 'sun-section', 'moon-section'
+    'current-section', 'hourly-section', 'daily-section',
+    'radar-section', 'sun-section', 'moon-section', 'details-section'
 ];
 
 // Default layout: ordered list with column assignments
 // 'left', 'right', or 'wide'
 const DEFAULT_LAYOUT_LIST = [
     { id: 'current-section', col: 'left' },
-    { id: 'details-section', col: 'right' },
     { id: 'hourly-section', col: 'wide' },
     { id: 'daily-section', col: 'wide' },
     { id: 'radar-section', col: 'left' },
     { id: 'sun-section', col: 'right' },
     { id: 'moon-section', col: 'right' },
+    { id: 'details-section', col: 'wide' },
 ];
 
 const DEFAULT_CHART_ORDER = ['chart-temp', 'chart-atmos', 'chart-precip', 'chart-wind'];
@@ -719,8 +719,20 @@ const weatherView = document.getElementById('weather-view');
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
 const searchError = document.getElementById('search-error');
+const recentLocationsEl = document.getElementById('recent-locations');
 const locationName = document.getElementById('location-name');
 const backBtn = document.getElementById('back-btn');
+
+const APP_SCRIPT_SRC = document.currentScript ? document.currentScript.src : 'js/app.js';
+
+function assetUrl(path) {
+    const clean = String(path || '').replace(/^\/+/, '');
+    try {
+        return new URL(clean, new URL('../', new URL(APP_SCRIPT_SRC, window.location.href))).href;
+    } catch (e) {
+        return path;
+    }
+}
 
 // --- Style (visual variant — orthogonal to light/dark theme) -----------------
 
@@ -2871,6 +2883,75 @@ function rerenderWeatherFromCache() {
 
 // --- Navigation & Event Listeners --------------------------------------------
 
+function makeRecentLocation(query, location) {
+    if (!location || !Number.isFinite(location.lat) || !Number.isFinite(location.lon)) return null;
+    return {
+        query: typeof query === 'string' ? query : '',
+        location: {
+            name: location.name || '',
+            region: location.region || '',
+            country: location.country || '',
+            lat: location.lat,
+            lon: location.lon,
+        }
+    };
+}
+
+function recentLocationKey(item) {
+    const lat = item && item.location ? parseFloat(item.location.lat) : NaN;
+    const lon = item && item.location ? parseFloat(item.location.lon) : NaN;
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return '';
+    return `${lat.toFixed(4)},${lon.toFixed(4)}`;
+}
+
+function mergeRecentLocation(list, query, location) {
+    const item = makeRecentLocation(query, location);
+    if (!item) return Array.isArray(list) ? list.slice(0, 8) : [];
+    const key = recentLocationKey(item);
+    return [item, ...(Array.isArray(list) ? list : []).filter(x => recentLocationKey(x) !== key)].slice(0, 8);
+}
+
+function loadRecentLocations() {
+    let raw;
+    try { raw = localStorage.getItem('recentLocations'); } catch (e) { return []; }
+    if (!raw) return [];
+    try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed
+            .map(x => makeRecentLocation(x.query, x.location || x))
+            .filter(Boolean)
+            .slice(0, 8);
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveRecentLocation(query, location) {
+    const recent = mergeRecentLocation(loadRecentLocations(), query, location);
+    try { localStorage.setItem('recentLocations', JSON.stringify(recent)); } catch (e) { /* quota / private mode — ignore */ }
+}
+
+function recentLocationLabel(item) {
+    const loc = item.location || {};
+    const secondary = loc.region || loc.country || '';
+    return secondary ? `${loc.name}, ${secondary}` : loc.name;
+}
+
+function renderRecentLocations() {
+    if (!recentLocationsEl) return;
+    const recent = loadRecentLocations();
+    if (recent.length === 0) {
+        recentLocationsEl.hidden = true;
+        recentLocationsEl.innerHTML = '';
+        return;
+    }
+    recentLocationsEl.innerHTML = recent.map((item, i) =>
+        `<button type="button" class="recent-location-btn" data-idx="${i}">${escapeHtml(recentLocationLabel(item))}</button>`
+    ).join('');
+    recentLocationsEl.hidden = false;
+}
+
 function showHome() {
     // Make sure the auto-resume CSS gate isn't still hiding the home view
     // (e.g. after popstate from a deep-link).
@@ -2879,6 +2960,7 @@ function showHome() {
     homeView.hidden = false;
     searchInput.value = '';
     searchError.hidden = true;
+    renderRecentLocations();
 }
 
 function showWeather(location, query) {
@@ -2924,6 +3006,21 @@ backBtn.addEventListener('click', () => {
     showHome();
     history.pushState(null, '', location.pathname);
 });
+
+if (recentLocationsEl) {
+    recentLocationsEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('.recent-location-btn');
+        if (!btn) return;
+        const item = loadRecentLocations()[parseInt(btn.dataset.idx, 10)];
+        if (!item) return;
+        const query = item.query || item.location.name;
+        setUnitsForCountry(item.location.country);
+        updateURL(query, item.location);
+        showWeather(item.location, query);
+        fetchAllWeatherData(item.location.lat, item.location.lon, item.location.country, item.location.region);
+        saveLastLocation(query, item.location);
+    });
+}
 
 document.getElementById('units-toggle').addEventListener('click', () => {
     toggleUnits();
@@ -3128,6 +3225,7 @@ function saveLastLocation(query, location) {
             lon: location.lon,
         }));
     } catch (e) { /* quota / private mode — ignore */ }
+    saveRecentLocation(query, location);
 }
 
 function getLocationFromStorage() {
@@ -3249,7 +3347,10 @@ async function loadFromURL() {
     }
     // Whether we resumed or not, the inline gate in <head> can now release.
     document.documentElement.removeAttribute('data-auto-resume');
-    if (!urlData) return;
+    if (!urlData) {
+        renderRecentLocations();
+        return;
+    }
 
     if (urlData.location) {
         // Direct lat/lon — skip geocoding entirely
@@ -3313,11 +3414,11 @@ initChartDrag();
     // Button text: "Language: [flag(s)] <lang name>"
     let btnFlagHtml;
     if (curLang === 'en') {
-        btnFlagHtml = `<img src="/img/flags/en.png" class="lang-btn-flag" alt="US"><img src="/img/flags/gb.png" class="lang-btn-flag" alt="UK">`;
+        btnFlagHtml = `<img src="${assetUrl('/img/flags/en.png')}" class="lang-btn-flag" alt="US"><img src="${assetUrl('/img/flags/gb.png')}" class="lang-btn-flag" alt="UK">`;
     } else if (curLang === 'pt') {
-        btnFlagHtml = `<img src="/img/flags/pt-br.png" class="lang-btn-flag" alt="BR"><img src="/img/flags/pt-eu.png" class="lang-btn-flag" alt="PT">`;
+        btnFlagHtml = `<img src="${assetUrl('/img/flags/pt-br.png')}" class="lang-btn-flag" alt="BR"><img src="${assetUrl('/img/flags/pt-eu.png')}" class="lang-btn-flag" alt="PT">`;
     } else {
-        btnFlagHtml = `<img src="${LANGUAGE_FLAGS[curLang]}" class="lang-btn-flag" alt="">`;
+        btnFlagHtml = `<img src="${assetUrl(LANGUAGE_FLAGS[curLang])}" class="lang-btn-flag" alt="">`;
     }
     langBtn.innerHTML = `${t('language')}: ${btnFlagHtml} ${LANGUAGE_NAMES[curLang] || 'English'}`;
 
@@ -3326,11 +3427,11 @@ initChartDrag();
         const checked = code === curLang ? 'checked' : '';
         let flagHtml;
         if (code === 'en') {
-            flagHtml = `<span class="lang-flags"><img src="/img/flags/en.png" alt="US"><img src="/img/flags/gb.png" alt="UK"></span>`;
+            flagHtml = `<span class="lang-flags"><img src="${assetUrl('/img/flags/en.png')}" alt="US"><img src="${assetUrl('/img/flags/gb.png')}" alt="UK"></span>`;
         } else if (code === 'pt') {
-            flagHtml = `<span class="lang-flags"><img src="/img/flags/pt-br.png" alt="BR"><img src="/img/flags/pt-eu.png" alt="PT"></span>`;
+            flagHtml = `<span class="lang-flags"><img src="${assetUrl('/img/flags/pt-br.png')}" alt="BR"><img src="${assetUrl('/img/flags/pt-eu.png')}" alt="PT"></span>`;
         } else {
-            flagHtml = `<img class="lang-flag" src="${LANGUAGE_FLAGS[code]}" alt="">`;
+            flagHtml = `<img class="lang-flag" src="${assetUrl(LANGUAGE_FLAGS[code])}" alt="">`;
         }
         return `<label class="language-option">
             <input type="radio" name="language" value="${code}" ${checked}>

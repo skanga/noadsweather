@@ -778,6 +778,36 @@ html[data-blurb-dismissed] #seo-blurb { display: none !important; }
     font-size: 0.9rem;
 }
 
+.recent-locations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.recent-locations[hidden] {
+    display: none;
+}
+
+.recent-location-btn {
+    max-width: 100%;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.recent-location-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 /* Theme toggle */
 #theme-toggle {
     position: fixed;
