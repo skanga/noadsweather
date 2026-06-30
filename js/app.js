@@ -2853,9 +2853,10 @@ function showWeather(location, query) {
     const secondary = location.region || location.country || '';
     let label = secondary ? `${location.name}, ${secondary}` : location.name;
     // Append postal code if the query looks like one
-    const postalMatch = query && query.trim().match(/^[\dA-Z][\dA-Z\s\-]{2,}$/i);
+    const trimmedQuery = query ? query.trim() : '';
+    const postalMatch = /\d/.test(trimmedQuery) && trimmedQuery.match(/^[\dA-Z][\dA-Z\s\-]{2,}$/i);
     if (postalMatch) {
-        label += ` (${query.trim()})`;
+        label += ` (${trimmedQuery})`;
     }
     locationName.textContent = label;
 }
