@@ -1,10 +1,8 @@
 // CONTRACT: This file must remain top-level side-effect-free. No DOM access,
 // no event listeners, no global mutations outside the explicit declarations
 // (TRANSLATIONS, LANGUAGE_FLAGS, getCurrentLang, getLocaleForDate, t,
-// setLanguage, setLanguageOverride). The build script (scripts/build-cities.js)
-// loads this file in a Node context via `new Function(src + '; return TRANSLATIONS;')`
-// to extract translations at build time. Anything that touches `window`,
-// `document`, or `navigator` at top level will throw under Node.
+// setLanguage). Anything that touches `window`, `document`, or `navigator`
+// at top level will throw under Node-style test extraction.
 //
 // Lazy access inside function bodies (e.g. navigator.language inside
 // getCurrentLang) is fine — those functions just aren't called by the build.
@@ -69,9 +67,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Show alert translation link',
         settingAutoPlayRadar: 'Always auto-play radar',
         settingRememberCity: 'Remember last city',
-        cityPageTitle: '{city} Weather',
-        cityPageSeoBlurb: 'Get the {city} weather forecast with Open-Meteo data, a 10-day forecast, hourly conditions, and radar.',
-        cityPageHideBlurb: 'click here to hide this',
 
         // Weather codes (WMO)
         wc0: 'Clear sky',
@@ -281,9 +276,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Mostrar enlace de traducción de alertas',
         settingAutoPlayRadar: 'Reproducir radar automáticamente',
         settingRememberCity: 'Recordar última ciudad',
-        cityPageTitle: 'Clima {city} sin anuncios',
-        cityPageSeoBlurb: 'Consulta el pronóstico del tiempo para {city} sin publicidad, cookies ni rastreamiento. Datos de Open-Meteo, pronóstico de 10 días, condiciones por hora y radar — todo gratis.',
-        cityPageHideBlurb: 'haz clic aquí para ocultar',
 
         // Weather codes
         wc0: 'Cielo despejado',
@@ -490,9 +482,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Afficher le lien de traduction des alertes',
         settingAutoPlayRadar: 'Lire le radar automatiquement',
         settingRememberCity: 'Mémoriser la dernière ville',
-        cityPageTitle: 'Météo {city} sans publicité',
-        cityPageSeoBlurb: 'Consultez les prévisions météo pour {city} sans publicité, cookies ni suivi. Données Open-Meteo, prévisions sur 10 jours, conditions horaires et radar — tout gratuit.',
-        cityPageHideBlurb: 'cliquez ici pour masquer',
 
         // Weather codes
         wc0: 'Ciel dégagé',
@@ -699,9 +688,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Übersetzungslink für Warnungen anzeigen',
         settingAutoPlayRadar: 'Radar automatisch abspielen',
         settingRememberCity: 'Letzte Stadt merken',
-        cityPageTitle: 'Wetter {city} ohne Werbung',
-        cityPageSeoBlurb: 'Wettervorhersage für {city} ohne Werbung, Cookies oder Tracking. Open-Meteo-Daten, 10-Tage-Vorhersage, stündliche Bedingungen und Radar — alles kostenlos.',
-        cityPageHideBlurb: 'hier klicken zum Ausblenden',
 
         // Weather codes
         wc0: 'Klarer Himmel',
@@ -908,9 +894,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Mostra link di traduzione delle allerte',
         settingAutoPlayRadar: 'Riproduci sempre il radar automaticamente',
         settingRememberCity: 'Ricorda ultima città',
-        cityPageTitle: 'Meteo {city} senza pubblicità',
-        cityPageSeoBlurb: 'Previsioni meteo per {city} senza pubblicità, cookie o tracciamento. Dati Open-Meteo, previsioni a 10 giorni, condizioni orarie e radar — tutto gratis.',
-        cityPageHideBlurb: 'clicca qui per nascondere',
 
         // Weather codes
         wc0: 'Cielo sereno',
@@ -1117,9 +1100,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Mostrar link de tradução de alertas',
         settingAutoPlayRadar: 'Reproduzir radar automaticamente',
         settingRememberCity: 'Lembrar última cidade',
-        cityPageTitle: 'Tempo {city} sem anúncios',
-        cityPageSeoBlurb: 'Previsão do tempo para {city} sem publicidade, cookies ou rastreamento. Dados do Open-Meteo, previsão de 10 dias, condições horárias e radar — tudo grátis.',
-        cityPageHideBlurb: 'clique aqui para ocultar',
 
         // Weather codes
         wc0: 'Céu limpo',
@@ -1326,9 +1306,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Vertaallink voor waarschuwingen tonen',
         settingAutoPlayRadar: 'Radar altijd automatisch afspelen',
         settingRememberCity: 'Laatste stad onthouden',
-        cityPageTitle: 'Weer {city} zonder reclame',
-        cityPageSeoBlurb: 'Weersverwachting voor {city} zonder reclame, cookies of tracking. Open-Meteo-data, 10-daagse verwachting, uurlijkse omstandigheden en radar — alles gratis.',
-        cityPageHideBlurb: 'klik hier om te verbergen',
 
         // Weather codes
         wc0: 'Heldere hemel',
@@ -1535,9 +1512,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Pokaż link do tłumaczenia ostrzeżeń',
         settingAutoPlayRadar: 'Zawsze automatycznie odtwarzaj radar',
         settingRememberCity: 'Zapamiętaj ostatnie miasto',
-        cityPageTitle: 'Pogoda {city} bez reklam',
-        cityPageSeoBlurb: 'Prognoza pogody dla {city} bez reklam, plików cookie ani śledzenia. Dane Open-Meteo, 10-dniowa prognoza, warunki godzinowe i radar — wszystko za darmo.',
-        cityPageHideBlurb: 'kliknij tutaj, aby ukryć',
 
         // Weather codes
         wc0: 'Bezchmurnie',
@@ -1744,9 +1718,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Visa översättningslänk för varningar',
         settingAutoPlayRadar: 'Spela alltid upp radar automatiskt',
         settingRememberCity: 'Kom ihåg senaste stad',
-        cityPageTitle: 'Väder {city} utan reklam',
-        cityPageSeoBlurb: 'Väderprognos för {city} utan reklam, cookies eller spårning. Open-Meteo-data, 10-dagarsprognos, timvis förhållanden och radar — allt gratis.',
-        cityPageHideBlurb: 'klicka här för att dölja',
 
         // Weather codes
         wc0: 'Klar himmel',
@@ -1953,9 +1924,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'Показывать ссылку для перевода предупреждений',
         settingAutoPlayRadar: 'Всегда воспроизводить радар автоматически',
         settingRememberCity: 'Запомнить последний город',
-        cityPageTitle: 'Погода {city} без рекламы',
-        cityPageSeoBlurb: 'Прогноз погоды для {city} без рекламы, cookies и отслеживания. Данные Open-Meteo, прогноз на 10 дней, почасовые условия и радар — всё бесплатно.',
-        cityPageHideBlurb: 'нажмите здесь, чтобы скрыть',
 
         // Weather codes
         wc0: 'Ясное небо',
@@ -2162,9 +2130,6 @@ const TRANSLATIONS = {
         settingTranslateLink: '警報の翻訳リンクを表示',
         settingAutoPlayRadar: 'レーダーを常に自動再生',
         settingRememberCity: '前回の都市を記憶',
-        cityPageTitle: '{city} 天気 広告なし',
-        cityPageSeoBlurb: '{city}の天気予報を広告、Cookie、トラッキングなしで。Open-Meteoデータ、10日間予報、時間ごとの状況、レーダー — すべて無料。',
-        cityPageHideBlurb: 'ここをクリックして非表示',
 
         // Weather codes
         wc0: '快晴',
@@ -2371,9 +2336,6 @@ const TRANSLATIONS = {
         settingTranslateLink: '显示警报翻译链接',
         settingAutoPlayRadar: '始终自动播放雷达',
         settingRememberCity: '记住上次城市',
-        cityPageTitle: '{city} 天气 无广告',
-        cityPageSeoBlurb: '{city}天气预报，无广告、无Cookie、无跟踪。Open-Meteo数据，10天预报，每小时状况和雷达——全部免费。',
-        cityPageHideBlurb: '点击此处隐藏',
 
         // Weather codes
         wc0: '晴',
@@ -2580,9 +2542,6 @@ const TRANSLATIONS = {
         settingTranslateLink: '경보 번역 링크 표시',
         settingAutoPlayRadar: '레이더 자동 재생',
         settingRememberCity: '마지막 도시 기억하기',
-        cityPageTitle: '{city} 날씨 광고 없음',
-        cityPageSeoBlurb: '{city} 날씨 예보, 광고, 쿠키, 추적 없이. Open-Meteo 데이터, 10일 예보, 시간별 상태 및 레이더 — 모두 무료.',
-        cityPageHideBlurb: '여기를 클릭하여 숨기기',
 
         // Weather codes
         wc0: '맑음',
@@ -2789,9 +2748,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'عرض رابط ترجمة التنبيهات',
         settingAutoPlayRadar: 'تشغيل الرادار تلقائيًا دائمًا',
         settingRememberCity: 'تذكر آخر مدينة',
-        cityPageTitle: 'طقس {city} بدون إعلانات',
-        cityPageSeoBlurb: 'توقعات الطقس لـ {city} بدون إعلانات أو ملفات تعريف الارتباط أو التتبع. بيانات Open-Meteo، توقعات لمدة 10 أيام، حالة كل ساعة، ورادار — كل ذلك مجاناً.',
-        cityPageHideBlurb: 'انقر هنا للإخفاء',
 
         // Weather codes
         wc0: 'سماء صافية',
@@ -2998,9 +2954,6 @@ const TRANSLATIONS = {
         settingTranslateLink: 'चेतावनी अनुवाद लिंक दिखाएं',
         settingAutoPlayRadar: 'हमेशा रडार स्वतः चलाएं',
         settingRememberCity: 'अंतिम शहर याद रखें',
-        cityPageTitle: '{city} मौसम बिना विज्ञापन',
-        cityPageSeoBlurb: '{city} के लिए मौसम पूर्वानुमान, बिना विज्ञापन, कुकीज़ या ट्रैकिंग के। Open-Meteo डेटा, 10-दिन का पूर्वानुमान, घंटे की स्थिति और रडार — सब कुछ मुफ़्त।',
-        cityPageHideBlurb: 'छिपाने के लिए यहां क्लिक करें',
 
         // Weather codes
         wc0: 'साफ आसमान',
@@ -3192,23 +3145,11 @@ const LANGUAGE_FLAGS = {
     hi: '/img/flags/hi.png'
 };
 
-// Per-page-load language override. Used by SEO city landing pages to
-// force the page's language without writing to localStorage (preserving
-// the user's saved preference for their next bare visit).
-let _languageOverride = null;
-
-function setLanguageOverride(lang) {
-    if (lang && TRANSLATIONS[lang]) {
-        _languageOverride = lang;
-    }
-}
-
 function getStoredLanguage() {
     try { return localStorage.getItem('language'); } catch { return null; }
 }
 
 function getCurrentLang() {
-    if (_languageOverride) return _languageOverride;
     const stored = getStoredLanguage();
     if (stored && TRANSLATIONS[stored]) return stored;
     const browser = (navigator.language || '').slice(0, 2).toLowerCase();
@@ -3240,6 +3181,5 @@ function t(key, vars) {
 
 function setLanguage(lang) {
     try { localStorage.setItem('language', lang); } catch {}
-    _languageOverride = null;  // user picked explicitly; URL override no longer applies
     location.reload();
 }

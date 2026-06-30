@@ -68,7 +68,7 @@
         </main>
         <div class="footer-links footer-links-fixed">
             <button id="privacy-toggle-home" class="privacy-link" data-i18n="privacyCookies">Privacy</button>
-            <a href="about/" class="privacy-link" data-i18n="about">About</a>
+            <button id="about-toggle-home" class="privacy-link" data-i18n="about">About</button>
         </div>
     </div>
 
@@ -86,16 +86,6 @@
             <h1 id="location-name"></h1>
         </header>
         <main id="weather-content">
-            <!-- SEO blurb — shown only on generated city landing pages.
-                 Populated by js/app.js when window._seoCity is set. Dismissed
-                 permanently to localStorage key 'hideCitySeoBlurb'. -->
-            <section id="seo-blurb" hidden>
-                <button id="seo-blurb-close" data-i18n="hide" data-i18n-attr="aria-label" aria-label="Hide" type="button">&times;</button>
-                <p>
-                    <span id="seo-blurb-text"></span>
-                    <a href="#" id="seo-blurb-hide-link"></a>
-                </p>
-            </section>
             <section id="alerts-section" role="alert" aria-live="assertive" hidden></section>
             <p id="weather-summary" aria-live="polite"></p>
             <section id="current-section"></section>
@@ -107,16 +97,45 @@
             <div class="bottom-spacer">
                 <div class="footer-links">
                     <button id="privacy-toggle-weather" class="privacy-link" data-i18n="privacyCookies">Privacy</button>
-                    <a href="about/" class="privacy-link" data-i18n="about">About</a>
+                    <button id="about-toggle-weather" class="privacy-link" data-i18n="about">About</button>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Privacy panel (shared, hidden by default) -->
+    <!-- About + privacy panel (shared, hidden by default) -->
     <div id="privacy-panel" hidden>
         <button id="privacy-close" data-i18n="close" data-i18n-attr="aria-label" aria-label="Close">&times;</button>
         <p id="i18n-disclaimer" data-i18n="machineTranslationNotice" hidden></p>
+        <h2>About Weather</h2>
+        <p>Weather forecasts without ads, cookies, or tracking.</p>
+        <p>Most weather websites bury the forecast under autoplay video, popups, banners, third-party tracking pixels, and cookie-consent dialogs. Weather is the opposite of that: open the page, see the weather, leave.</p>
+        <ul>
+            <li><strong>No ads.</strong> No display ads, native ads, sponsored content, or affiliate links.</li>
+            <li><strong>No tracking.</strong> No analytics, pixels, fingerprinting, or third-party scripts.</li>
+            <li><strong>No cookies.</strong> Preferences stay in your browser's local storage.</li>
+            <li><strong>Self-hosted fonts.</strong> Fonts come from this site, not Google Fonts.</li>
+            <li><strong>Open source.</strong> The source code is on <a href="https://github.com/skanga/weather" target="_blank" rel="noopener">GitHub</a>.</li>
+        </ul>
+        <p>Weather is a static site. There is no backend user database because there are no users. Your browser calls weather services directly, except for API-key-protected alerts routed through our own proxy.</p>
+
+        <h3>Browse popular cities</h3>
+        <ul class="panel-cities-grid">
+            <li><a href="?q=New%20York&amp;lat=40.7128&amp;lon=-74.0060&amp;name=New%20York&amp;region=NY&amp;country=United%20States">New York NY</a></li>
+            <li><a href="?q=Los%20Angeles&amp;lat=34.0522&amp;lon=-118.2437&amp;name=Los%20Angeles&amp;region=CA&amp;country=United%20States">Los Angeles CA</a></li>
+            <li><a href="?q=Chicago&amp;lat=41.8781&amp;lon=-87.6298&amp;name=Chicago&amp;region=IL&amp;country=United%20States">Chicago IL</a></li>
+            <li><a href="?q=Houston&amp;lat=29.7604&amp;lon=-95.3698&amp;name=Houston&amp;region=TX&amp;country=United%20States">Houston TX</a></li>
+            <li><a href="?q=Austin&amp;lat=30.2672&amp;lon=-97.7431&amp;name=Austin&amp;region=TX&amp;country=United%20States">Austin TX</a></li>
+            <li><a href="?q=Miami&amp;lat=25.7617&amp;lon=-80.1918&amp;name=Miami&amp;region=FL&amp;country=United%20States">Miami FL</a></li>
+            <li><a href="?q=London&amp;lat=51.5074&amp;lon=-0.1278&amp;name=London&amp;region=&amp;country=United%20Kingdom">London</a></li>
+            <li><a href="?q=Toronto&amp;lat=43.6532&amp;lon=-79.3832&amp;name=Toronto&amp;region=ON&amp;country=Canada">Toronto</a></li>
+            <li><a href="?q=Tokyo&amp;lat=35.6762&amp;lon=139.6503&amp;name=Tokyo&amp;region=&amp;country=Japan">Tokyo</a></li>
+            <li><a href="?q=Sydney&amp;lat=-33.8688&amp;lon=151.2093&amp;name=Sydney&amp;region=NSW&amp;country=Australia">Sydney</a></li>
+            <li><a href="?q=Berlin&amp;lat=52.5200&amp;lon=13.4050&amp;name=Berlin&amp;region=&amp;country=Germany">Berlin</a></li>
+            <li><a href="?q=Lisbon&amp;lat=38.7223&amp;lon=-9.1393&amp;name=Lisbon&amp;region=&amp;country=Portugal">Lisbon</a></li>
+        </ul>
+
+        <h2 id="privacy-details">Privacy Policy</h2>
         <p><strong>No cookies. No tracking. No ads.</strong></p>
         <p>This site does not use cookies, does not track your location, and does not collect any personal information. We don't use analytics, fingerprinting, or any form of user tracking.</p>
         <p>When you search for a city or zip code, the coordinates of that location (not your personal location) are sent to the following third-party services to retrieve weather data:</p>

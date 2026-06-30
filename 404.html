@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Weather</title>
+    <script>
+        (function () {
+            const cities = {
+                "new-york-ny":{"name":"New York","lat":40.7128,"lon":-74.006,"region":"NY","country":"United States"},
+                "los-angeles-ca":{"name":"Los Angeles","lat":34.0522,"lon":-118.2437,"region":"CA","country":"United States"},
+                "chicago-il":{"name":"Chicago","lat":41.8781,"lon":-87.6298,"region":"IL","country":"United States"},
+                "houston-tx":{"name":"Houston","lat":29.7604,"lon":-95.3698,"region":"TX","country":"United States"},
+                "phoenix-az":{"name":"Phoenix","lat":33.4484,"lon":-112.074,"region":"AZ","country":"United States"},
+                "philadelphia-pa":{"name":"Philadelphia","lat":39.9526,"lon":-75.1652,"region":"PA","country":"United States"},
+                "san-antonio-tx":{"name":"San Antonio","lat":29.4241,"lon":-98.4936,"region":"TX","country":"United States"},
+                "san-diego-ca":{"name":"San Diego","lat":32.7157,"lon":-117.1611,"region":"CA","country":"United States"},
+                "dallas-tx":{"name":"Dallas","lat":32.7767,"lon":-96.797,"region":"TX","country":"United States"},
+                "austin-tx":{"name":"Austin","lat":30.2672,"lon":-97.7431,"region":"TX","country":"United States"},
+                "seattle-wa":{"name":"Seattle","lat":47.6062,"lon":-122.3321,"region":"WA","country":"United States"},
+                "miami-fl":{"name":"Miami","lat":25.7617,"lon":-80.1918,"region":"FL","country":"United States"},
+                "boston-ma":{"name":"Boston","lat":42.3601,"lon":-71.0589,"region":"MA","country":"United States"},
+                "denver-co":{"name":"Denver","lat":39.7392,"lon":-104.9903,"region":"CO","country":"United States"},
+                "toronto":{"name":"Toronto","lat":43.6532,"lon":-79.3832,"region":"ON","country":"Canada"},
+                "london":{"name":"London","lat":51.5074,"lon":-0.1278,"region":"","country":"United Kingdom"},
+                "dublin":{"name":"Dublin","lat":53.3498,"lon":-6.2603,"region":"","country":"Ireland"},
+                "hong-kong":{"name":"Hong Kong","lat":22.3193,"lon":114.1694,"region":"","country":"Hong Kong"},
+                "singapore":{"name":"Singapore","lat":1.3521,"lon":103.8198,"region":"","country":"Singapore"},
+                "sydney":{"name":"Sydney","lat":-33.8688,"lon":151.2093,"region":"NSW","country":"Australia"},
+                "melbourne":{"name":"Melbourne","lat":-37.8136,"lon":144.9631,"region":"VIC","country":"Australia"},
+                "auckland":{"name":"Auckland","lat":-36.8485,"lon":174.7633,"region":"","country":"New Zealand"},
+                "cape-town":{"name":"Cape Town","lat":-33.9249,"lon":18.4241,"region":"","country":"South Africa"},
+                "ciudad-de-mexico":{"name":"Mexico City","lat":19.4326,"lon":-99.1332,"region":"","country":"Mexico"},
+                "mexico-city-en":{"name":"Mexico City","lat":19.4326,"lon":-99.1332,"region":"","country":"Mexico"},
+                "madrid":{"name":"Madrid","lat":40.4168,"lon":-3.7038,"region":"","country":"Spain"},
+                "madrid-en":{"name":"Madrid","lat":40.4168,"lon":-3.7038,"region":"","country":"Spain"},
+                "barcelona":{"name":"Barcelona","lat":41.3851,"lon":2.1734,"region":"","country":"Spain"},
+                "barcelona-en":{"name":"Barcelona","lat":41.3851,"lon":2.1734,"region":"","country":"Spain"},
+                "buenos-aires":{"name":"Buenos Aires","lat":-34.6037,"lon":-58.3816,"region":"","country":"Argentina"},
+                "buenos-aires-en":{"name":"Buenos Aires","lat":-34.6037,"lon":-58.3816,"region":"","country":"Argentina"},
+                "lima":{"name":"Lima","lat":-12.0464,"lon":-77.0428,"region":"","country":"Peru"},
+                "lima-en":{"name":"Lima","lat":-12.0464,"lon":-77.0428,"region":"","country":"Peru"},
+                "bogota":{"name":"Bogot\u00e1","lat":4.711,"lon":-74.0721,"region":"","country":"Colombia"},
+                "bogota-en":{"name":"Bogot\u00e1","lat":4.711,"lon":-74.0721,"region":"","country":"Colombia"},
+                "lisboa":{"name":"Lisbon","lat":38.7223,"lon":-9.1393,"region":"","country":"Portugal"},
+                "lisbon-en":{"name":"Lisbon","lat":38.7223,"lon":-9.1393,"region":"","country":"Portugal"},
+                "sao-paulo":{"name":"S\u00e3o Paulo","lat":-23.5505,"lon":-46.6333,"region":"","country":"Brazil"},
+                "sao-paulo-en":{"name":"S\u00e3o Paulo","lat":-23.5505,"lon":-46.6333,"region":"","country":"Brazil"},
+                "rio-de-janeiro":{"name":"Rio de Janeiro","lat":-22.9068,"lon":-43.1729,"region":"","country":"Brazil"},
+                "rio-de-janeiro-en":{"name":"Rio de Janeiro","lat":-22.9068,"lon":-43.1729,"region":"","country":"Brazil"},
+                "paris":{"name":"Paris","lat":48.8566,"lon":2.3522,"region":"","country":"France"},
+                "paris-en":{"name":"Paris","lat":48.8566,"lon":2.3522,"region":"","country":"France"},
+                "berlin":{"name":"Berlin","lat":52.52,"lon":13.405,"region":"","country":"Germany"},
+                "berlin-en":{"name":"Berlin","lat":52.52,"lon":13.405,"region":"","country":"Germany"},
+                "munchen":{"name":"Munich","lat":48.1351,"lon":11.582,"region":"","country":"Germany"},
+                "munich-en":{"name":"Munich","lat":48.1351,"lon":11.582,"region":"","country":"Germany"},
+                "wien":{"name":"Vienna","lat":48.2082,"lon":16.3738,"region":"","country":"Austria"},
+                "vienna-en":{"name":"Vienna","lat":48.2082,"lon":16.3738,"region":"","country":"Austria"},
+                "roma":{"name":"Rome","lat":41.9028,"lon":12.4964,"region":"","country":"Italy"},
+                "rome-en":{"name":"Rome","lat":41.9028,"lon":12.4964,"region":"","country":"Italy"},
+                "milano":{"name":"Milan","lat":45.4642,"lon":9.19,"region":"","country":"Italy"},
+                "milan-en":{"name":"Milan","lat":45.4642,"lon":9.19,"region":"","country":"Italy"},
+                "amsterdam":{"name":"Amsterdam","lat":52.3676,"lon":4.9041,"region":"","country":"Netherlands"},
+                "amsterdam-en":{"name":"Amsterdam","lat":52.3676,"lon":4.9041,"region":"","country":"Netherlands"},
+                "warszawa":{"name":"Warsaw","lat":52.2297,"lon":21.0122,"region":"","country":"Poland"},
+                "warsaw-en":{"name":"Warsaw","lat":52.2297,"lon":21.0122,"region":"","country":"Poland"},
+                "stockholm":{"name":"Stockholm","lat":59.3293,"lon":18.0686,"region":"","country":"Sweden"},
+                "stockholm-en":{"name":"Stockholm","lat":59.3293,"lon":18.0686,"region":"","country":"Sweden"},
+                "moskva":{"name":"Moscow","lat":55.7558,"lon":37.6173,"region":"","country":"Russia"},
+                "moscow-en":{"name":"Moscow","lat":55.7558,"lon":37.6173,"region":"","country":"Russia"},
+                "tokyo":{"name":"Tokyo","lat":35.6762,"lon":139.6503,"region":"","country":"Japan"},
+                "tokyo-en":{"name":"Tokyo","lat":35.6762,"lon":139.6503,"region":"","country":"Japan"},
+                "osaka":{"name":"Osaka","lat":34.6937,"lon":135.5023,"region":"","country":"Japan"},
+                "osaka-en":{"name":"Osaka","lat":34.6937,"lon":135.5023,"region":"","country":"Japan"},
+                "beijing":{"name":"Beijing","lat":39.9042,"lon":116.4074,"region":"","country":"China"},
+                "beijing-en":{"name":"Beijing","lat":39.9042,"lon":116.4074,"region":"","country":"China"},
+                "shanghai":{"name":"Shanghai","lat":31.2304,"lon":121.4737,"region":"","country":"China"},
+                "shanghai-en":{"name":"Shanghai","lat":31.2304,"lon":121.4737,"region":"","country":"China"},
+                "seoul":{"name":"Seoul","lat":37.5665,"lon":126.978,"region":"","country":"South Korea"},
+                "seoul-en":{"name":"Seoul","lat":37.5665,"lon":126.978,"region":"","country":"South Korea"},
+                "mumbai":{"name":"Mumbai","lat":19.076,"lon":72.8777,"region":"","country":"India"},
+                "mumbai-en":{"name":"Mumbai","lat":19.076,"lon":72.8777,"region":"","country":"India"},
+                "delhi":{"name":"Delhi","lat":28.6139,"lon":77.209,"region":"","country":"India"},
+                "delhi-en":{"name":"Delhi","lat":28.6139,"lon":77.209,"region":"","country":"India"},
+                "dubai":{"name":"Dubai","lat":25.2048,"lon":55.2708,"region":"","country":"United Arab Emirates"},
+                "dubai-en":{"name":"Dubai","lat":25.2048,"lon":55.2708,"region":"","country":"United Arab Emirates"}
+            };
+            const match = location.pathname.match(/\/weather\/cities\/([^/]+)\/?$/);
+            const city = match && cities[match[1]];
+            if (city) {
+                const params = new URLSearchParams({
+                    q: city.name,
+                    lat: city.lat.toFixed(4),
+                    lon: city.lon.toFixed(4),
+                    name: city.name,
+                    region: city.region,
+                    country: city.country,
+                });
+                location.replace('/weather/?' + params);
+                return;
+            }
+            location.replace('/weather/');
+        })();
+    </script>
+</head>
+<body>
+    <p>Redirecting to Weather...</p>
+</body>
+</html>

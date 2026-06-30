@@ -27,7 +27,6 @@ function functionSource(src, name) {
 {
     const helpers = new Function(`
         const TRANSLATIONS = { en: {} };
-        let _languageOverride = null;
         const localStorage = { getItem: () => { throw new Error('blocked'); } };
         const navigator = { language: 'en-US' };
         ${functionSource(i18nSrc, 'getStoredLanguage')}

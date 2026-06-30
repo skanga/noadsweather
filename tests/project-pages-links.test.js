@@ -3,26 +3,23 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-const about = fs.readFileSync(path.join(root, 'about', 'index.html'), 'utf8');
-const privacy = fs.readFileSync(path.join(root, 'privacy.html'), 'utf8');
-const city = fs.readFileSync(path.join(root, 'cities', 'new-york-ny', 'index.html'), 'utf8');
+const read = (...parts) => fs.readFileSync(path.join(root, ...parts), 'utf8');
 
-assert.doesNotMatch(index, /href="\/about\/"/);
-assert.match(index, /href="about\/"/);
+const index = read('index.html');
 
-for (const html of [about, privacy]) {
-    assert.doesNotMatch(html, /href="\/(about\/|privacy\.html|cities\/|")/);
-    assert.doesNotMatch(html, /(?:href|src)="\/(?:css|js)\//);
+for (const snippet of [
+    'id="privacy-panel"',
+    'id="about-toggle-home"',
+    'id="about-toggle-weather"',
+    'About Weather',
+    'Privacy Policy',
+    'q=New%20York',
+    'lat=40.7128',
+]) {
+    assert.ok(index.includes(snippet), snippet);
 }
 
-assert.match(about, /href="\.\.\/"/);
-assert.match(about, /href="\.\.\/privacy\.html"/);
-assert.match(about, /href="\.\.\/cities\/new-york-ny\/"/);
-assert.match(about, /src="\.\.\/js\/i18n\.js"/);
-assert.match(privacy, /href="\.\/"/);
-assert.match(privacy, /href="about\/"/);
-assert.match(city, /href="\/weather\/css\/style\.css"/);
-assert.match(city, /src="\/weather\/js\/i18n\.js"/);
-assert.match(city, /src="\/weather\/js\/app\.js"/);
-assert.match(city, /href="\/weather\/about\/"/);
+assert.ok(!fs.existsSync(path.join(root, 'privacy.html')));
+assert.ok(!fs.existsSync(path.join(root, 'about', 'index.html')));
+assert.doesNotMatch(index, /href="[^"]*(?:about\/|privacy\.html|\/cities\/)/);
+assert.doesNotMatch(index, /(?:href|src)="\/(?:about|privacy\.html|cities|css|js)\b/);

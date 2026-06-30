@@ -45,33 +45,17 @@ npx http-server . -p 8080
 
 Then open `http://localhost:8080`.
 
-### Regenerating city pages
-
-There is one optional build script: `scripts/build-cities.js`. It regenerates the 77 static city pages under `cities/` plus `sitemap.xml`. You only need to re-run it when you edit either:
-
-- `scripts/cities.json` (the city list), or
-- the city-page i18n keys in `js/i18n.js` (`cityPageTitle`, `cityPageSeoBlurb`, `cityPageHideBlurb`).
-
-```bash
-node scripts/build-cities.js
-```
-
-The generated `cities/` directory is committed to the repo so GitHub Pages can serve it directly.
-
 ## Project Structure
 
 ```
-index.html          — Single-page app entry; also the template used by build-cities.js
-privacy.html        — Standalone privacy page
-about/              — Standalone about page
+index.html          — Single-page app entry
+404.html            — Redirects old city-page URLs into app deep links
 css/style.css       — All styles with CSS custom properties for theming
-js/app.js           — All application logic (~3362 lines)
+js/app.js           — All application logic
 js/i18n.js          — TRANSLATIONS object (15 languages)
 fonts/, img/        — Static assets
-scripts/            — build-cities.js + cities.json (generates city pages + sitemap.xml)
-cities/             — 77 generated city pages (committed)
 alerts-proxy/       — Cloud Run proxy for NWS alerts
-robots.txt, sitemap.xml
+robots.txt
 LICENSE             — MIT License
 ```
 

@@ -647,58 +647,6 @@ h1, h2, h3, h4, h5, h6 {
    city. Cleared by app.js (in loadFromURL/showHome) when no longer needed. */
 html[data-auto-resume] #home-view { display: none; }
 
-/* SEO city pages: hide home view immediately on cold load (no flash before
-   app.js runs), and hide blurb if the user previously dismissed it. Set by
-   the inline head script in generated /cities/* pages. */
-html[data-seo-city] #home-view { display: none; }
-html[data-blurb-dismissed] #seo-blurb { display: none !important; }
-
-/* SEO blurb — visible on /cities/* landing pages only. Dismissed permanently
-   via the X button or the inline link, persisted in localStorage. */
-#seo-blurb {
-    position: relative;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.75rem 2.25rem 0.75rem 0.875rem;
-    margin: 0 0 1rem;
-    font-size: 0.9rem;
-    line-height: 1.45;
-    color: var(--text-muted);
-}
-
-#seo-blurb p {
-    margin: 0;
-}
-
-#seo-blurb-hide-link {
-    color: var(--text-muted);
-    text-decoration: underline;
-    cursor: pointer;
-    margin-left: 0.35em;
-}
-
-#seo-blurb-hide-link:hover {
-    color: var(--text);
-}
-
-#seo-blurb-close {
-    position: absolute;
-    top: 0.25rem;
-    right: 0.4rem;
-    background: none;
-    border: none;
-    font-size: 1.25rem;
-    line-height: 1;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 0.25rem 0.4rem;
-}
-
-#seo-blurb-close:hover {
-    color: var(--text);
-}
-
 /* Home View */
 .home-header {
     text-align: center;
@@ -907,12 +855,40 @@ html[data-blurb-dismissed] #seo-blurb { display: none !important; }
     margin-bottom: 0.75rem;
 }
 
+#privacy-panel h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.1rem;
+    color: var(--accent);
+}
+
+#privacy-panel h2:not(:first-of-type),
+#privacy-panel h3 {
+    margin-top: 1.25rem;
+}
+
+#privacy-panel h3 {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
 #privacy-panel ul {
     margin: 0 0 0.75rem 1.25rem;
 }
 
 #privacy-panel li {
     margin-bottom: 0.25rem;
+}
+
+#privacy-panel a {
+    color: var(--accent);
+}
+
+.panel-cities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.25rem 0.75rem;
+    list-style: none;
+    margin-left: 0 !important;
 }
 
 /* Weather View */
