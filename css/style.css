@@ -1352,7 +1352,7 @@ body.is-dragging .weather-col:empty {
         align-items: stretch;
     }
     .weather-col:empty {
-        min-height: 0;
+        display: none;
     }
     .section-controls {
         opacity: 1;
