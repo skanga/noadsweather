@@ -1220,6 +1220,15 @@ function showLocationPicker(results) {
     });
 }
 
+// fetch() has no default timeout, so a hanging/throttled API leaves the UI
+// stuck on "loading" forever. Abort after `ms` so callers' catch paths run.
+function fetchWithTimeout(url, options, ms) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms || 15000);
+    return fetch(url, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(timer));
+}
+
 async function fetchOpenMeteo(lat, lon) {
     const params = new URLSearchParams({
         latitude: lat,
@@ -1234,7 +1243,7 @@ async function fetchOpenMeteo(lat, lon) {
         timezone: 'auto',
         forecast_days: 10,
     });
-    const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
+    const res = await fetchWithTimeout(`https://api.open-meteo.com/v1/forecast?${params}`);
     if (!res.ok) throw new Error('Weather data request failed');
     return res.json();
 }
