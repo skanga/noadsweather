@@ -182,9 +182,12 @@ const TRANSLATIONS = {
         removeSection: 'Remove section',
         minimizeSection: 'Minimize section',
         hideChart: 'Hide chart',
+        forecastColorsCaption: '— colors show relative temps: red = warmest, blue = coolest',
+        alertUntil: 'until {time}',
 
         // Radar controls
         refreshRadar: 'Refresh radar',
+        nwsRadarLinkTitle: 'Open this location on NWS radar',
         pauseRadar: 'Pause',
         playRadar: 'Play',
         // Radar progress / forecast labels

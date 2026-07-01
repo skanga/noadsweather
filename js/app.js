@@ -1164,7 +1164,7 @@ function showLocationPicker(results) {
     return new Promise((resolve) => {
         const container = document.getElementById('search-error');
         container.hidden = false;
-        container.style.color = '#1a1a1a';
+        container.style.color = 'var(--text)';
 
         let html = `<div style="margin-top:0.5rem;">${t('didYouMean')}</div>`;
         html += '<div style="display:flex;flex-direction:column;gap:0.25rem;margin-top:0.5rem;">';
@@ -1596,7 +1596,7 @@ function renderDaily(daily, hourly) {
     function chartRow(id, height, legendHtml, leftLabels, rightLabels) {
         return `
             <div class="chart-row" data-chart-id="${id}">
-                <div class="chart-legend"><span class="chart-drag-handle" title="Drag to reorder">⠿</span>${legendHtml}<button class="chart-min-btn" data-chart-id="${id}" title="Hide chart">✕</button></div>
+                <div class="chart-legend"><span class="chart-drag-handle" title="${t('dragToReorder')}">⠿</span>${legendHtml}<button class="chart-min-btn" data-chart-id="${id}" title="${t('hideChart')}">✕</button></div>
                 <div class="chart-row-inner">
                     <div class="chart-axis chart-axis-left">${leftLabels}</div>
                     <canvas id="${id}" width="${innerW}" height="${height}" style="display:block;width:${innerW}px;height:${height}px;"></canvas>
@@ -1619,7 +1619,7 @@ function renderDaily(daily, hourly) {
     const r = chartRanges;
 
     const tempLegend = `<span><span style="color:#dc2626;">■</span> ${t('chartTemperature')} (${tempUnit()})</span><span><span style="color:#9333ea;">■</span> ${t('chartFeelsLike')} (${tempUnit()})</span><span><span style="color:#16a34a;">■</span> ${t('chartDewPoint')} (${tempUnit()})</span>`;
-    const atmosLegend = `<span><span style="color:#9ca3af;">■</span> ${t('chartCloudCover')} (%)</span><span><span style="color:#3b82f6;">■</span> ${t('chartPrecipChance')} (%)</span><span><span style="color:#84cc16;">■</span> ${t('chartHumidity')} (%)</span><span><span style="color:#1a1a1a;">■</span> ${t('chartPressure')} (inHg)</span>`;
+    const atmosLegend = `<span><span style="color:#9ca3af;">■</span> ${t('chartCloudCover')} (%)</span><span><span style="color:#3b82f6;">■</span> ${t('chartPrecipChance')} (%)</span><span><span style="color:#84cc16;">■</span> ${t('chartHumidity')} (%)</span><span><span style="color:${isDarkMode() ? '#e5e7eb' : '#1a1a1a'};">■</span> ${t('chartPressure')} (inHg)</span>`;
     const precipLegend = `<span><span style="color:#3b82f6;">■</span> ${t('chartPrecipAccum')} (${isImperial() ? 'in' : 'mm'})</span><span><span style="color:#16a34a;">■</span> ${t('chartHourlyPrecip')} (${isImperial() ? 'in' : 'mm'})</span>`;
     const windLegend = `<span><span style="color:#2563eb;">■</span> ${t('chartWindSpeed')} (${windUnit()})</span>`;
 
@@ -1628,7 +1628,7 @@ function renderDaily(daily, hourly) {
     const totalScrollW = innerW + AXIS_W * 2;
 
     section.innerHTML = `
-        <h2>${t('tenDayForecast')} ${showTempColors ? '<span style="text-transform:none;font-weight:400;font-size:0.7rem;color:var(--text-muted);">— colors show relative temps: red = warmest, blue = coolest</span>' : ''}</h2>
+        <h2>${t('tenDayForecast')} ${showTempColors ? `<span style="text-transform:none;font-weight:400;font-size:0.7rem;color:var(--text-muted);">${escapeHtml(t('forecastColorsCaption'))}</span>` : ''}</h2>
         <div class="forecast-scroll-outer">
             <div class="forecast-scroll" style="width:${totalScrollW}px;">
                 <div class="forecast-header">
@@ -1832,7 +1832,7 @@ function drawAllCharts(hourly, hours, r) {
         drawLine(ctx, precipChance, hours, '#3b82f6', 0, 100, w, h, pad);
         const pMin = Math.min(...pressure) - 0.1;
         const pMax = Math.max(...pressure) + 0.1;
-        drawLine(ctx, pressure, hours, '#1a1a1a', pMin, pMax, w, h, pad);
+        drawLine(ctx, pressure, hours, isDarkMode() ? '#e5e7eb' : '#1a1a1a', pMin, pMax, w, h, pad);
     }
 
     // Precipitation
@@ -1934,7 +1934,7 @@ function renderAlerts(alerts) {
         const severity = escapeHtml(p.severity || '');
         const ends = formatAlertTime(p.ends || p.expires || p.end);
         const areas = escapeHtml(p.areaDesc || '');
-        const meta = [severity, ends ? `until ${ends}` : '', areas].filter(Boolean).join(' · ');
+        const meta = [severity, ends ? t('alertUntil', { time: ends }) : '', areas].filter(Boolean).join(' · ');
         const descRaw = (p.description || '').trim();
         // Full text to translate = event + headline + description
         const fullText = [p.event, p.headline, descRaw].filter(Boolean).join('\n\n');
@@ -2025,7 +2025,7 @@ function renderRadar(lat, lon) {
             opacity: { alerts: 0.8, local: 0.6, localStations: 0.8, national: 0.6 }
         };
         const url = `https://radar.weather.gov/?settings=v1_${encodeURIComponent(btoa(JSON.stringify(settings)))}`;
-        nwsLink = `<a href="${url}" target="_blank" rel="noopener" class="nws-radar-link" title="Open this location on NWS radar">NWS radar ↗</a>`;
+        nwsLink = `<a href="${url}" target="_blank" rel="noopener" class="nws-radar-link" title="${t('nwsRadarLinkTitle')}">NWS radar ↗</a>`;
     }
 
     section.innerHTML = `

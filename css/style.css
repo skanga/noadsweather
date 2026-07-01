@@ -1441,6 +1441,9 @@ body.is-dragging .weather-col:empty {
     overflow-x: auto;
     padding-bottom: 0.5rem;
     cursor: grab;
+    /* Fade the right edge so the horizontal scroll is discoverable on touch */
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
 }
 
 .hourly-scroll.dragging {
