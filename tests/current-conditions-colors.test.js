@@ -35,3 +35,10 @@ assert.deepStrictEqual(helpers.uvLabel(11), { text: '(Extreme)', color: '#7c3aed
 
 const renderCurrent = functionSource(appSrc, 'renderCurrent');
 assert.match(renderCurrent, /style="color:\$\{uvInfo\.color\};"/);
+
+// Label/value demarcation must target the grid the markup actually uses
+// (not the dead .current-detail-col selector): muted label + colon + bold value.
+const cssSrc = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
+assert.match(cssSrc, /\.current-details-grid \.detail-label\s*\{[^}]*color:\s*var\(--text-muted\)/, 'label is muted');
+assert.match(cssSrc, /\.current-details-grid \.detail-label::after\s*\{[^}]*content:\s*':'/, 'label has a colon');
+assert.match(cssSrc, /\.current-details-grid \.detail-value\s*\{[^}]*font-weight:\s*600/, 'value is emphasized');

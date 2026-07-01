@@ -1499,26 +1499,16 @@ body.is-dragging .weather-col:empty {
     grid-column: 1 / -1;
 }
 
-.current-detail-col {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-}
-
-.current-detail-col .detail-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.current-detail-col .detail-label {
-    font-size: 0.7rem;
+/* Demarcate each "Label: value" pair — muted label + colon, emphasized value. */
+.current-details-grid .detail-label {
     color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
 }
 
-.current-detail-col .detail-value {
+.current-details-grid .detail-label::after {
+    content: ':';
+}
+
+.current-details-grid .detail-value {
     font-weight: 600;
 }
 
