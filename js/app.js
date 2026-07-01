@@ -2814,6 +2814,7 @@ async function fetchAllWeatherData(lat, lon, country, region) {
         if (myToken !== weatherLoadToken) return null;
         document.getElementById('current-section').innerHTML =
             `<p class="error">${t('failedToLoadWeather')}</p>`;
+        applySectionPreferences();
         return null;
     });
 
@@ -2826,7 +2827,6 @@ async function fetchAllWeatherData(lat, lon, country, region) {
             if (meteo && airQuality) {
                 renderCurrent(meteo.current, airQuality);
             }
-            applySectionPreferences();
         });
     }).catch(() => {});
 
@@ -2835,14 +2835,12 @@ async function fetchAllWeatherData(lat, lon, country, region) {
         if (myToken !== weatherLoadToken) return;
         _lastAlerts = alerts;
         renderAlerts(alerts);
-        applySectionPreferences();
     }).catch(() => {});
 
     // Radar — render independently (has its own loading state)
     meteoPromise.then(() => {
         if (myToken !== weatherLoadToken) return;
         renderRadar(lat, lon);
-        applySectionPreferences();
     });
 }
 
