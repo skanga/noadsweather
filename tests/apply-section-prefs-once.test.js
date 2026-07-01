@@ -33,4 +33,10 @@ assert.match(
     'the meteo catch block must apply layout on failure'
 );
 
+// On forecast failure the dependent sections (wind/hourly/daily/sun/moon) are
+// left empty. Since sections carry card chrome, an empty one must be hidden
+// rather than render as a blank box.
+const cssSrc = fs.readFileSync(path.join(__dirname, '..', 'css/style.css'), 'utf8');
+assert.match(cssSrc, /section:empty\s*\{[^}]*display:\s*none/, 'empty weather sections are hidden');
+
 console.log('apply-section-prefs-once: all assertions passed');

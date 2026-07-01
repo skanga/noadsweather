@@ -1204,6 +1204,12 @@ section {
     margin-top: 0;
 }
 
+/* A section with no content (e.g. one left empty when the forecast fetch
+   fails, or briefly during load) shouldn't render as a blank card. */
+section:empty {
+    display: none;
+}
+
 /* Only apply overflow hidden where needed for scrollable content */
 #hourly-section,
 #daily-section,
