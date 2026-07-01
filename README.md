@@ -6,7 +6,7 @@ A fast, ad-free, privacy-respecting weather website. No tracking, no cookies, no
 
 ## Why?
 
-Weather websites are some of the most bloated pages on the internet. A typical weather page loads 6-12MB of JavaScript, tracking scripts, and ads just to show you the temperature. This app loads in under 530KB total — that's 10-20x lighter.
+Weather websites are some of the most bloated pages on the internet. A typical weather page loads 6-12MB of JavaScript, tracking scripts, and ads just to show you the temperature. This app loads its core page under 350KB — that's 10-20x lighter.
 
 ## Features
 
@@ -30,7 +30,7 @@ Weather websites are some of the most bloated pages on the internet. A typical w
 - **Frontend:** Plain HTML, CSS, vanilla JavaScript — no frameworks, no bundler, no npm dependencies at runtime
 - **Hosting:** GitHub Pages (free)
 - **Weather data:** [Open-Meteo API](https://open-meteo.com/) (free, no API key)
-- **Radar:** [RainViewer API](https://www.rainviewer.com/api.html) (free) + [CartoDB](https://carto.com/basemaps/) map tiles
+- **Radar:** [RainViewer API](https://www.rainviewer.com/api.html) (free) + [CartoDB](https://carto.com/basemaps/) map tiles + NoAdsRadar Cloud Run future-cast tiles for the contiguous US
 - **Alerts:** [NWS API](https://www.weather.gov/documentation/services-web-api) (free, US only) + optional user-provided OpenWeatherMap One Call API key for non-US alerts
 - **Air quality:** [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api) (free)
 - **Postal codes:** [Zippopotam](https://api.zippopotam.us/) (free, 60+ countries)
@@ -49,10 +49,11 @@ Then open `http://localhost:8080`.
 
 ```
 index.html          — Single-page app entry
-404.html            — Redirects old city-page URLs into app deep links
+404.html            — Redirects legacy URLs into app deep links
 css/style.css       — All styles with CSS custom properties for theming
 js/app.js           — All application logic
 js/i18n.js          — TRANSLATIONS object (15 languages)
+tests/              — Unit tests
 fonts/, img/        — Static assets
 robots.txt
 LICENSE             — MIT License
@@ -62,14 +63,14 @@ LICENSE             — MIT License
 
 1. User searches a city name or postal code
 2. Geocoding converts the search to lat/lon coordinates (Open-Meteo for cities, Zippopotam for postal codes)
-3. All weather APIs are called in parallel from the browser — no backend needed
+3. All weather APIs are called in parallel from the browser to remote backends & cloud services
 4. Sections render progressively as each API responds
 5. User preferences (layout, units, theme, optional OpenWeatherMap key) are saved in localStorage
 
 ## Cost
 
 - **Hosting:** Free (GitHub Pages)
-- **APIs:** Free (Open-Meteo, RainViewer, NWS, Zippopotam); non-US alerts require the user's own OpenWeatherMap key
+- **APIs:** Free (Open-Meteo, RainViewer, NWS, Zippopotam); non-US alerts require the user's own OpenWeatherMap key; NoAdsRadar uses the project's Cloud Run service
 - **Total:** $0/year
 
 ## License
