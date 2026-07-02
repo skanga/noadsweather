@@ -58,16 +58,14 @@ function functionSource(src, name) {
     assert.match(renderAlerts, /<summary[^>]*>\$\{t\('showMore'\)\}<\/summary>/, 'summary is a plain show-more toggle');
 }
 
-// --- #2: Air Quality is the last current-conditions item and spans full width ---
+// --- #2: Air Quality is a half-width item, not the old full-width row ---
 {
     const renderCurrent = functionSource(appSrc, 'renderCurrent');
     const uvIdx = renderCurrent.indexOf("t('uvIndex')");
     const aqIdx = renderCurrent.indexOf("t('airQuality')");
     assert.ok(uvIdx !== -1 && aqIdx !== -1, 'both UV Index and Air Quality rendered');
-    assert.ok(aqIdx > uvIdx, 'Air Quality comes after UV Index (rendered last)');
-    assert.match(renderCurrent, /detail-item detail-wide[\s\S]*t\('airQuality'\)/, 'Air Quality item is full-width');
-
-    assert.match(cssSrc, /\.detail-wide\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/, 'detail-wide spans both grid columns');
+    assert.doesNotMatch(renderCurrent, /detail-wide/, 'Air Quality no longer spans full width');
+    assert.doesNotMatch(cssSrc, /detail-wide/, 'dead detail-wide rule removed');
 }
 
 console.log('alert-dedup-current-layout: all assertions passed');

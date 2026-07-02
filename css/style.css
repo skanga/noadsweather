@@ -1501,10 +1501,6 @@ body.is-dragging .weather-col:empty {
     font-size: 0.85rem;
 }
 
-.current-details-grid .detail-item.detail-wide {
-    grid-column: 1 / -1;
-}
-
 /* Demarcate each "Label: value" pair — muted label + colon, emphasized value. */
 .current-details-grid .detail-label {
     color: var(--text-muted);
