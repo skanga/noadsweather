@@ -53,7 +53,7 @@ return { makeRecentLocation, mergeRecentLocation, recentLocationLabel };
 
 {
     let list = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 15; i++) {
         list = helpers.mergeRecentLocation(list, `City ${i}`, {
             name: `City ${i}`,
             region: '',
@@ -62,9 +62,9 @@ return { makeRecentLocation, mergeRecentLocation, recentLocationLabel };
             lon: i,
         });
     }
-    assert.strictEqual(list.length, 8);
-    assert.strictEqual(list[0].query, 'City 9');
-    assert.strictEqual(list[7].query, 'City 2');
+    assert.strictEqual(list.length, 12);
+    assert.strictEqual(list[0].query, 'City 14');
+    assert.strictEqual(list[11].query, 'City 3');
 }
 
 assert.strictEqual(helpers.recentLocationLabel({

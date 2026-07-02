@@ -1089,7 +1089,7 @@ async function geocodeZip(query) {
     return await geocodeZipInner(trimmed);
 }
 
-async function geocode(query) {
+async function geocode(query, autoPick = false) {
     // Check if input looks like a postal code
     const postal = await geocodeZip(query);
     if (postal) return postal;
@@ -1155,7 +1155,9 @@ async function geocode(query) {
         return results[0];
     }
 
-    // Multiple results — show picker
+    // Multiple results — show picker, or just take the first for shareable
+    // ?q= URLs that should resolve without user interaction.
+    if (autoPick) return results[0];
     return showLocationPicker(results);
 }
 
@@ -2932,11 +2934,39 @@ function recentLocationKey(item) {
     return `${lat.toFixed(4)},${lon.toFixed(4)}`;
 }
 
+// ponytail: static seed shown until the user has real history; not persisted,
+// so the first real search replaces it (renderRecentLocations falls back here
+// only when storage is empty).
+const POPULAR_LOCATIONS = [
+    { name: 'San Francisco', region: 'California', country: 'United States', lat: 37.7749, lon: -122.4194 },
+    { name: 'Los Angeles', region: 'California', country: 'United States', lat: 34.0522, lon: -118.2437 },
+    { name: 'Chicago', region: 'Illinois', country: 'United States', lat: 41.8781, lon: -87.6298 },
+    { name: 'Seattle', region: 'Washington', country: 'United States', lat: 47.6062, lon: -122.3321 },
+    { name: 'New York', region: 'New York', country: 'United States', lat: 40.7128, lon: -74.0060 },
+    { name: 'Miami', region: 'Florida', country: 'United States', lat: 25.7743, lon: -80.1937 },
+    { name: 'Mumbai', region: 'Maharashtra', country: 'India', lat: 19.0728, lon: 72.8826 },
+    { name: 'Paris', region: 'Île-de-France', country: 'France', lat: 48.8566, lon: 2.3522 },
+    { name: 'Tokyo', region: 'Tokyo', country: 'Japan', lat: 35.6762, lon: 139.6503 },
+    { name: 'London', region: 'England', country: 'United Kingdom', lat: 51.5074, lon: -0.1278 },
+    { name: 'Sydney', region: 'New South Wales', country: 'Australia', lat: -33.8688, lon: 151.2093 },
+    { name: 'Singapore', region: '', country: 'Singapore', lat: 1.3521, lon: 103.8198 },
+].map(loc => makeRecentLocation(loc.name, loc));
+
+// Real history first, then popular-city seeds to fill up to the 12-slot cap
+// (deduped). Each real search pushes one seed off the end rather than clearing
+// them all at once.
+function displayedRecentLocations() {
+    const recent = loadRecentLocations();
+    const keys = new Set(recent.map(recentLocationKey));
+    const fill = POPULAR_LOCATIONS.filter(x => !keys.has(recentLocationKey(x)));
+    return [...recent, ...fill].slice(0, 12);
+}
+
 function mergeRecentLocation(list, query, location) {
     const item = makeRecentLocation(query, location);
-    if (!item) return Array.isArray(list) ? list.slice(0, 8) : [];
+    if (!item) return Array.isArray(list) ? list.slice(0, 12) : [];
     const key = recentLocationKey(item);
-    return [item, ...(Array.isArray(list) ? list : []).filter(x => recentLocationKey(x) !== key)].slice(0, 8);
+    return [item, ...(Array.isArray(list) ? list : []).filter(x => recentLocationKey(x) !== key)].slice(0, 12);
 }
 
 function loadRecentLocations() {
@@ -2949,7 +2979,7 @@ function loadRecentLocations() {
         return parsed
             .map(x => makeRecentLocation(x.query, x.location || x))
             .filter(Boolean)
-            .slice(0, 8);
+            .slice(0, 12);
     } catch (e) {
         return [];
     }
@@ -2968,7 +2998,7 @@ function recentLocationLabel(item) {
 
 function renderRecentLocations() {
     if (!recentLocationsEl) return;
-    const recent = loadRecentLocations();
+    const recent = displayedRecentLocations();
     if (recent.length === 0) {
         recentLocationsEl.hidden = true;
         recentLocationsEl.innerHTML = '';
@@ -3010,17 +3040,24 @@ function showWeather(location, query) {
     locationName.textContent = label;
 }
 
+// Set by loadFromURL before firing a synthetic submit so a ?q= URL auto-picks
+// the first geocode match instead of opening the picker. Read-and-cleared at
+// the top of the handler (dispatch runs synchronously, so no races).
+let autoPickNextSearch = false;
+
 searchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const query = searchInput.value.trim();
     if (!query) return;
+    const autoPick = autoPickNextSearch;
+    autoPickNextSearch = false;
 
     searchError.hidden = true;
     searchForm.querySelector('button').disabled = true;
     searchForm.querySelector('button').textContent = t('searching');
 
     try {
-        const location = await geocode(query);
+        const location = await geocode(query, autoPick);
         setUnitsForCountry(location.country);
         updateURL(query, location);
         showWeather(location, query);
@@ -3044,7 +3081,7 @@ if (recentLocationsEl) {
     recentLocationsEl.addEventListener('click', (e) => {
         const btn = e.target.closest('.recent-location-btn');
         if (!btn) return;
-        const item = loadRecentLocations()[parseInt(btn.dataset.idx, 10)];
+        const item = displayedRecentLocations()[parseInt(btn.dataset.idx, 10)];
         if (!item) return;
         const query = item.query || item.location.name;
         setUnitsForCountry(item.location.country);
@@ -3305,6 +3342,7 @@ async function loadFromURL() {
         saveLastLocation(urlData.query, urlData.location);
     } else if (urlData.query) {
         searchInput.value = urlData.query;
+        autoPickNextSearch = true;
         searchForm.dispatchEvent(new Event('submit'));
     }
 }
