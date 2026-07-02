@@ -55,8 +55,16 @@ for (const field of ['us_aqi_pm2_5', 'us_aqi_pm10', 'us_aqi_ozone',
     assert.ok(fetchSrc.includes(field), `fetchAirQuality should request ${field}`);
 }
 
-// The current-conditions AQI line surfaces the dominant pollutant.
+// The current-conditions render surfaces the dominant pollutant in its own
+// labeled row.
 const renderSrc = functionSource(appSrc, 'renderCurrent');
-assert.ok(/dominantPollutant/.test(renderSrc), 'renderCurrent should show the dominant pollutant');
+assert.ok(/dominantPollutant/.test(renderSrc), 'renderCurrent should compute the dominant pollutant');
+assert.ok(/t\('mainPollutant'\)/.test(renderSrc), 'renderCurrent should label its own mainPollutant row');
+
+// Every language defines the mainPollutant label.
+const i18nSrc = fs.readFileSync(path.join(__dirname, '..', 'js/i18n.js'), 'utf8');
+const langs = i18nSrc.match(/^ {4}[a-z]{2}(-[A-Z]{2})?:\s*\{/gm).length;
+const labels = (i18nSrc.match(/^ {8}mainPollutant:/gm) || []).length;
+assert.strictEqual(labels, langs, `mainPollutant defined in all ${langs} languages (found ${labels})`);
 
 console.log('dominant-pollutant: OK');

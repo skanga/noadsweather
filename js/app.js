@@ -1581,7 +1581,12 @@ function renderCurrent(current, airQuality) {
             ${aqiInfo ? `
             <div class="detail-item detail-wide">
                 <span class="detail-label">${t('airQuality')}</span>
-                <span class="detail-value" style="color:${aqiInfo.color};">${aqi} (${aqiInfo.text})${dom ? ` · ${dom}` : ''}</span>
+                <span class="detail-value" style="color:${aqiInfo.color};">${aqi} (${aqiInfo.text})</span>
+            </div>` : ''}
+            ${dom ? `
+            <div class="detail-item">
+                <span class="detail-label">${t('mainPollutant')}</span>
+                <span class="detail-value">${dom}</span>
             </div>` : ''}
         </div>
     `;
