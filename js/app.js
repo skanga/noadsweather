@@ -1253,7 +1253,8 @@ async function fetchAirQuality(lat, lon) {
         const params = new URLSearchParams({
             latitude: lat,
             longitude: lon,
-            current: 'us_aqi',
+            current: 'us_aqi,us_aqi_pm2_5,us_aqi_pm10,us_aqi_ozone,' +
+                'us_aqi_nitrogen_dioxide,us_aqi_sulphur_dioxide,us_aqi_carbon_monoxide',
         });
         const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?${params}`);
         if (!res.ok) return null;
@@ -1261,6 +1262,29 @@ async function fetchAirQuality(lat, lon) {
     } catch {
         return null;
     }
+}
+
+// us_aqi is the max of its six sub-indices, so the one driving it is the
+// "dominant pollutant". Symbols (PM2.5, O₃, ...) are universal, no i18n needed.
+// ponytail: argmax over sub-indices, not exact-equality match to us_aqi, so
+// rounding never leaves us with no match.
+const AQI_POLLUTANTS = {
+    us_aqi_pm2_5: 'PM2.5',
+    us_aqi_pm10: 'PM10',
+    us_aqi_ozone: 'O₃',
+    us_aqi_nitrogen_dioxide: 'NO₂',
+    us_aqi_sulphur_dioxide: 'SO₂',
+    us_aqi_carbon_monoxide: 'CO',
+};
+
+function dominantPollutant(airQuality) {
+    if (!airQuality || airQuality.us_aqi == null) return null;
+    let best = null, bestVal = 0;
+    for (const key in AQI_POLLUTANTS) {
+        const v = airQuality[key];
+        if (typeof v === 'number' && v > bestVal) { bestVal = v; best = key; }
+    }
+    return best ? AQI_POLLUTANTS[best] : null;
 }
 
 function aqiLabel(aqi) {
@@ -1515,6 +1539,7 @@ function renderCurrent(current, airQuality) {
     const uvInfo = uvLabel(uvVal);
     const aqi = airQuality ? airQuality.us_aqi : null;
     const aqiInfo = aqi !== null ? aqiLabel(aqi) : null;
+    const dom = dominantPollutant(airQuality);
 
     section.innerHTML = `
         <h2>${t('currentConditions')}</h2>
@@ -1556,7 +1581,7 @@ function renderCurrent(current, airQuality) {
             ${aqiInfo ? `
             <div class="detail-item detail-wide">
                 <span class="detail-label">${t('airQuality')}</span>
-                <span class="detail-value" style="color:${aqiInfo.color};">${aqi} (${aqiInfo.text})</span>
+                <span class="detail-value" style="color:${aqiInfo.color};">${aqi} (${aqiInfo.text})${dom ? ` · ${dom}` : ''}</span>
             </div>` : ''}
         </div>
     `;
